@@ -61,5 +61,43 @@ All `/api/leads*`, `/api/search`, `/api/auth/me`, and checkout require
 - **Plan limits** (`usage.py`): Starter = 10 searches / 30-day period; Pro &
   Agency = unlimited. Period auto-resets.
 
+## Tests
+```bash
+cd backend && source .venv/bin/activate
+pytest -q          # 16 tests: auth, scoring, search flow, pipeline, PDF, alerts
+```
+The suite stubs Google Places, so it needs no API keys.
+
+## Deploy / hosting
+
+### Option A — Render (free, public URL)
+1. Push this repo to GitHub.
+2. On https://render.com: **New > Blueprint**, select the repo. It reads
+   `render.yaml` and builds `backend/Dockerfile`.
+3. After the first deploy, open the service's **Environment** tab and set
+   `GOOGLE_PLACES_API_KEY` (and Stripe keys if testing billing). Redeploy.
+4. Visit the Render URL — the marketing site + dashboard are served at `/`.
+
+> Free plan storage is ephemeral: the SQLite DB resets on redeploy. For
+> persistence, set `DATABASE_URL` to a managed Postgres URL.
+
+### Option B — Docker (any host)
+```bash
+# build context is the repo root so the image can include index.html
+docker build -f backend/Dockerfile -t locallead .
+docker run -p 8000:8000 -e JWT_SECRET=$(openssl rand -hex 32) \
+  -e GOOGLE_PLACES_API_KEY=your_key locallead
+```
+
+### Option C — Local
+Follow **Run** above, then open http://localhost:8000.
+
+### What you can test without keys
+Signup, login, the dashboard UI, plan-limit messaging, and CSV/PDF endpoints
+all work with **no keys**. **Lead search returns 503 until
+`GOOGLE_PLACES_API_KEY` is set** — that key is what powers the core feature.
+Stripe checkout returns 503 until Stripe keys are set. Hit `/api/health` to see
+what's configured.
+
 ## Roadmap (not yet built)
-PDF audit reports, contact finder enrichment, new-lead alerts, CRM push.
+CRM push (HubSpot/Pipedrive); CSV export covers the manual case today.
