@@ -563,6 +563,13 @@
     .res-row { flex-direction: column; }
     .res-right { flex-direction: row; align-items: center; }
   }
+  .watches { margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .watch-chip { display: inline-flex; align-items: center; gap: 8px; border: var(--border); background: var(--yellow); font-size: 12px; font-weight: 700; padding: 6px 10px; }
+  .watch-chip button { background: none; border: none; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 12px; }
+  .watch-chip .scan { color: var(--ink); text-decoration: underline; }
+  .watch-chip .rm { color: var(--red); }
+  .watch-add { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; border: var(--border); background: var(--cream); padding: 6px 10px; cursor: pointer; }
+  .watch-add:hover { background: var(--ink); color: var(--cream); }
 </style>
 </head>
 <body>
@@ -932,6 +939,7 @@
       <button type="submit" class="btn btn-shadow" id="searchBtn">Find Leads →</button>
     </form>
     <div class="app-status" id="appStatus"></div>
+    <div class="watches" id="watchesBox"></div>
     <div class="pipeline-tabs" id="pipelineTabs">
       <button data-status="" class="active">All</button>
       <button data-status="new">New</button>
@@ -1049,6 +1057,7 @@
     try {
       await refreshUsage();
       await loadLeads();
+      await loadWatches();
     } catch (err) {
       if (err.status === 401) { clearToken(); closeApp(); showAuth('login'); }
     }
@@ -1087,7 +1096,9 @@
       setActiveTab('');
       renderLeads(data.leads);
       setStatus(`${data.count} leads found for "${data.query}". Sorted by opportunity score.`);
+      lastQuery = { category, city };
       await refreshUsage();
+      await loadWatches();
     } catch (err) {
       setStatus(err.message, true);
     } finally {
@@ -1098,6 +1109,57 @@
   async function loadLeads() {
     const leads = await api('/api/leads' + (currentStatus ? '?status=' + currentStatus : ''));
     renderLeads(leads);
+  }
+
+  // ---------- Watches / alerts ----------
+  let lastQuery = null;
+  let watches = [];
+
+  async function loadWatches() {
+    watches = await api('/api/watches');
+    renderWatches();
+  }
+
+  function renderWatches() {
+    const box = document.getElementById('watchesBox');
+    box.innerHTML = '';
+    watches.forEach((w) => {
+      const chip = document.createElement('span');
+      chip.className = 'watch-chip';
+      chip.innerHTML = `★ ${esc(w.category)} / ${esc(w.city)} <button class="scan" data-id="${w.id}">scan</button><button class="rm" data-id="${w.id}" title="Stop watching">×</button>`;
+      box.appendChild(chip);
+    });
+    const alreadyWatched = lastQuery && watches.some((w) =>
+      w.category.toLowerCase() === lastQuery.category.toLowerCase() && w.city.toLowerCase() === lastQuery.city.toLowerCase());
+    if (lastQuery && !alreadyWatched) {
+      const add = document.createElement('button');
+      add.className = 'watch-add';
+      add.textContent = '★ Watch this search';
+      add.onclick = addWatch;
+      box.appendChild(add);
+    }
+    box.querySelectorAll('.watch-chip .scan').forEach((b) => b.onclick = () => scanWatch(b.dataset.id));
+    box.querySelectorAll('.watch-chip .rm').forEach((b) => b.onclick = () => removeWatch(b.dataset.id));
+  }
+
+  async function addWatch() {
+    if (!lastQuery) return;
+    try { await api('/api/watches', { method: 'POST', body: lastQuery }); await loadWatches(); }
+    catch (err) { setStatus(err.message, true); }
+  }
+  async function removeWatch(id) {
+    try { await api('/api/watches/' + id, { method: 'DELETE' }); await loadWatches(); }
+    catch (err) { setStatus(err.message, true); }
+  }
+  async function scanWatch(id) {
+    setStatus('Re-scanning for new businesses…');
+    try {
+      const r = await api('/api/watches/' + id + '/scan', { method: 'POST' });
+      if (r.error) { setStatus('Scan issue: ' + r.error, true); return; }
+      setStatus(r.new_count ? `${r.new_count} new lead(s) found!` : `No new businesses since last scan (${r.total} checked).`);
+      await loadLeads();
+      await loadWatches();
+    } catch (err) { setStatus(err.message, true); }
   }
 
   function setActiveTab(status) {

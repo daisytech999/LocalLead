@@ -25,6 +25,14 @@ class Settings(BaseSettings):
     checkout_success_url: str = "http://localhost:8000/?checkout=success"
     checkout_cancel_url: str = "http://localhost:8000/?checkout=cancel"
 
+    # SMTP for new-lead alert emails (optional; alerts still record without it)
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    smtp_from: str = "LocalLead Alerts <alerts@locallead.app>"
+    smtp_use_tls: bool = True
+
 
 @lru_cache
 def get_settings() -> Settings:

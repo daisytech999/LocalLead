@@ -86,3 +86,25 @@ class CheckoutRequest(BaseModel):
 
 class CheckoutResponse(BaseModel):
     checkout_url: str
+
+
+# ---------- Watches / alerts ----------
+class WatchCreate(BaseModel):
+    category: str = Field(min_length=1, max_length=120)
+    city: str = Field(min_length=1, max_length=160)
+
+
+class WatchOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    id: int
+    category: str
+    city: str
+    last_scanned_at: datetime | None
+    created_at: datetime
+
+
+class ScanResult(BaseModel):
+    new_count: int
+    total: int
+    error: str | None = None
+    new_leads: list[LeadOut] = []

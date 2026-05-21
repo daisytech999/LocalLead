@@ -1,7 +1,6 @@
 import csv
 import io
 import json
-from concurrent.futures import ThreadPoolExecutor
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi.responses import StreamingResponse
@@ -9,23 +8,14 @@ from sqlalchemy.orm import Session
 
 from ..auth import get_current_user
 from ..database import get_db
+from ..leadstore import audit_many, upsert_lead
 from ..models import LEAD_STATUSES, Lead, User
 from ..schemas import LeadOut, LeadUpdate, SearchRequest, SearchResponse
 from ..services import places
-from ..services.audit import audit_website
 from ..services.report import build_report
-from ..services.scoring import score_lead
 from ..usage import can_search, record_search, search_limit
 
 router = APIRouter(prefix="/api", tags=["leads"])
-
-
-def _audit_and_score(biz: dict) -> dict:
-    flags, meta = audit_website(biz.get("website"), biz.get("review_count"))
-    biz["audit"] = flags
-    biz["score"] = score_lead(flags, biz.get("review_count"), biz.get("rating"))
-    biz["contacts"] = meta.get("contacts", {"email": None, "socials": []})
-    return biz
 
 
 def _lead_to_out(lead: Lead) -> LeadOut:
@@ -56,44 +46,13 @@ def search(payload: SearchRequest, db: Session = Depends(get_db), user: User = D
     except places.PlacesAPIError as exc:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=str(exc))
 
-    # Run website audits concurrently (network-bound).
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        businesses = list(pool.map(_audit_and_score, businesses))
-
+    # Audit concurrently, then persist to the user's pipeline, sorted by score.
+    businesses = audit_many(businesses)
     businesses.sort(key=lambda b: b.get("score") or 0, reverse=True)
 
-    # Upsert into the user's saved leads (so they persist to the pipeline).
     out_leads: list[LeadOut] = []
     for biz in businesses:
-        lead = None
-        if biz.get("place_id"):
-            lead = (
-                db.query(Lead)
-                .filter(Lead.user_id == user.id, Lead.place_id == biz["place_id"])
-                .first()
-            )
-        if lead is None:
-            lead = Lead(user_id=user.id, place_id=biz.get("place_id"), status="new")
-            db.add(lead)
-        lead.name = biz.get("name") or "Unknown"
-        lead.address = biz.get("address")
-        lead.phone = biz.get("phone")
-        lead.website = biz.get("website")
-        lead.category = payload.category
-        lead.city = payload.city
-        lead.lat = biz.get("lat")
-        lead.lng = biz.get("lng")
-        lead.rating = biz.get("rating")
-        lead.review_count = biz.get("review_count")
-        lead.audit_json = json.dumps(biz.get("audit", []))
-        lead.score = biz.get("score")
-        contacts = biz.get("contacts") or {}
-        # Don't overwrite a found contact with nothing on a re-scan.
-        if contacts.get("email"):
-            lead.contact_email = contacts["email"]
-        if contacts.get("socials"):
-            lead.contact_socials = json.dumps(contacts["socials"])
-        db.flush()
+        lead = upsert_lead(db, user.id, biz, payload.category, payload.city)
         out_leads.append(_lead_to_out(lead))
 
     record_search(user, db)

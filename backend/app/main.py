@@ -8,7 +8,7 @@ from sqlalchemy import inspect, text
 
 from .config import get_settings
 from .database import Base, engine
-from .routers import auth, billing, leads
+from .routers import auth, billing, leads, watches
 
 settings = get_settings()
 
@@ -44,6 +44,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(leads.router)
 app.include_router(billing.router)
+app.include_router(watches.router)
 
 # Serve the marketing frontend (index.html lives at the repo root).
 FRONTEND = Path(__file__).resolve().parents[2] / "index.html"
