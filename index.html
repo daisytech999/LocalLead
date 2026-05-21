@@ -490,6 +490,79 @@
     .lead-score { font-size: 38px; }
     .hero { padding: 48px 0 44px; }
   }
+
+  /* ---------- AUTH MODAL ---------- */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 5000;
+    background: rgba(10,10,10,0.6);
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--cream);
+    border: var(--border);
+    box-shadow: 10px 10px 0 var(--ink);
+    width: 100%; max-width: 420px;
+    padding: 32px 30px 30px;
+    position: relative;
+  }
+  .modal h3 { font-size: 30px; margin-bottom: 6px; }
+  .modal .modal-sub { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 17px; margin-bottom: 22px; }
+  .modal label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 6px; }
+  .modal input {
+    width: 100%; font-family: 'JetBrains Mono', monospace; font-size: 14px;
+    padding: 11px 12px; border: var(--border); background: #fff; margin-bottom: 16px;
+  }
+  .modal input:focus { outline: 2px solid var(--red); outline-offset: -1px; }
+  .modal .btn { width: 100%; text-align: center; margin-top: 4px; }
+  .modal-switch { font-size: 13px; margin-top: 18px; text-align: center; }
+  .modal-switch a { color: var(--red); text-decoration: underline; cursor: pointer; font-weight: 700; }
+  .modal-close { position: absolute; top: 12px; right: 14px; background: none; border: none; font-family: 'JetBrains Mono', monospace; font-size: 24px; cursor: pointer; line-height: 1; }
+  .modal-error { background: var(--red); color: #fff; font-size: 12.5px; padding: 9px 11px; margin-bottom: 16px; display: none; }
+  .modal-error.show { display: block; }
+
+  /* ---------- APP / DASHBOARD ---------- */
+  .app-overlay { display: none; position: fixed; inset: 0; z-index: 4000; background: var(--cream); overflow-y: auto; }
+  .app-overlay.open { display: block; }
+  .app-bar {
+    position: sticky; top: 0; background: var(--cream); border-bottom: var(--border);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 24px; height: 64px; z-index: 10;
+  }
+  .app-bar .usage { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .app-bar .usage b { color: var(--red); }
+  .app-actions { display: flex; gap: 10px; align-items: center; }
+  .app-main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; }
+  .search-form { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; border: var(--border); padding: 22px; background: #fff; box-shadow: 6px 6px 0 var(--ink); margin-bottom: 12px; }
+  .search-form .field { flex: 1; min-width: 180px; }
+  .search-form label { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; margin-bottom: 6px; }
+  .search-form input { width: 100%; font-family: 'JetBrains Mono', monospace; font-size: 14px; padding: 11px 12px; border: var(--border); background: var(--cream); }
+  .search-form input:focus { outline: 2px solid var(--red); outline-offset: -1px; }
+  .app-status { font-size: 13px; margin: 14px 2px; min-height: 18px; }
+  .app-status.err { color: var(--red); font-weight: 700; }
+  .pipeline-tabs { display: flex; gap: 0; border: var(--border); border-bottom: none; flex-wrap: wrap; margin-top: 30px; }
+  .pipeline-tabs button { flex: 1; font-family: 'JetBrains Mono', monospace; font-weight: 700; text-transform: uppercase; font-size: 11px; letter-spacing: 0.05em; padding: 12px 8px; background: var(--cream); border: none; border-right: var(--border); cursor: pointer; }
+  .pipeline-tabs button:last-child { border-right: none; }
+  .pipeline-tabs button.active { background: var(--ink); color: var(--cream); }
+  .app-results { border: var(--border); background: #fff; }
+  .app-results:empty::after { content: "No leads yet. Run a search above."; display: block; padding: 40px; text-align: center; color: var(--gray); font-family: 'Instrument Serif', serif; font-style: italic; font-size: 18px; }
+  .res-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 16px 18px; border-bottom: var(--border); }
+  .res-row:last-child { border-bottom: none; }
+  .res-info { flex: 1; min-width: 0; }
+  .res-name { font-family: 'Anton', sans-serif; text-transform: uppercase; font-size: 19px; line-height: 1; margin-bottom: 5px; }
+  .res-meta { font-size: 12px; color: var(--gray); margin-bottom: 9px; }
+  .res-meta a { color: var(--red); text-decoration: underline; }
+  .res-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .res-score { font-family: 'Anton', sans-serif; font-size: 40px; line-height: 0.8; }
+  .res-controls { display: flex; gap: 6px; align-items: center; margin-top: 8px; }
+  .res-controls select { font-family: 'JetBrains Mono', monospace; font-size: 11px; padding: 5px 6px; border: var(--border); background: var(--cream); text-transform: uppercase; }
+  .res-del { background: none; border: var(--border); cursor: pointer; font-size: 11px; padding: 5px 8px; font-family: 'JetBrains Mono', monospace; }
+  .res-del:hover { background: var(--red); color: #fff; border-color: var(--red); }
+  @media (max-width: 600px) {
+    .res-row { flex-direction: column; }
+    .res-right { flex-direction: row; align-items: center; }
+  }
 </style>
 </head>
 <body>
@@ -506,7 +579,7 @@
       <a href="#vs">vs Buddy</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
-      <a href="#pricing" class="btn">Try Free</a>
+      <a href="#" class="btn" data-action="auth">Try Free</a>
     </div>
     <button class="nav-toggle btn-outline btn" id="navToggle" aria-label="Toggle menu">Menu</button>
   </div>
@@ -519,7 +592,7 @@
     <h1 class="reveal">Stop scrolling <span class="strike">Google Maps</span> <span class="serif">for hours.</span></h1>
     <p class="hero-sub reveal">Every city has hundreds of local businesses with broken sites, no websites, or weak SEO. You're spending hours finding them. We'll give you the whole list in 30 seconds.</p>
     <div class="hero-ctas reveal">
-      <a href="#pricing" class="btn btn-lg btn-shadow">Find Leads Now →</a>
+      <a href="#" class="btn btn-lg btn-shadow" data-action="app">Find Leads Now →</a>
       <a href="#manifesto" class="btn btn-outline btn-lg">Read the Manifesto</a>
     </div>
     <p class="footnote reveal">Free forever for the first 100 freelancers. No card.</p>
@@ -716,7 +789,7 @@
           <li>CSV export</li>
           <li>Community access</li>
         </ul>
-        <a href="#" class="btn btn-outline">Start Free</a>
+        <a href="#" class="btn btn-outline" data-plan="starter">Start Free</a>
       </div>
       <div class="plan featured">
         <span class="popular-tag">Most Popular</span>
@@ -731,7 +804,7 @@
           <li>Lead pipeline</li>
           <li>New lead alerts</li>
         </ul>
-        <a href="#" class="btn">Start Free Trial</a>
+        <a href="#" class="btn" data-plan="pro">Start Free Trial</a>
       </div>
       <div class="plan">
         <div class="plan-name">Agency</div>
@@ -744,7 +817,7 @@
           <li>API access</li>
           <li>Priority support</li>
         </ul>
-        <a href="#" class="btn btn-outline">Start Free Trial</a>
+        <a href="#" class="btn btn-outline" data-plan="agency">Start Free Trial</a>
       </div>
     </div>
     <p class="price-note reveal">No credit card to start. Cancel any time. Built for solo freelancers, priced like it.</p>
@@ -776,7 +849,7 @@
   <div class="wrap">
     <h2 class="reveal">Your <span class="serif">next 50 clients</span> are in your city right now.</h2>
     <p class="reveal">Stop wasting Saturdays on Google Maps. Find them in 30 seconds.</p>
-    <a href="#pricing" class="btn btn-cream reveal">FIND THEM NOW →</a>
+    <a href="#" class="btn btn-cream reveal" data-action="app">FIND THEM NOW →</a>
   </div>
 </section>
 
@@ -812,6 +885,302 @@
     <div class="foot-bottom">© 2026 LocalLead. Built by one person who got tired of the grind.</div>
   </div>
 </footer>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay" id="authModal" role="dialog" aria-modal="true" aria-label="Sign up or log in">
+  <div class="modal">
+    <button class="modal-close" id="authClose" aria-label="Close">×</button>
+    <h3 id="authTitle">Start free.</h3>
+    <p class="modal-sub" id="authSub">Free forever for the first 100 freelancers. No card.</p>
+    <div class="modal-error" id="authError"></div>
+    <form id="authForm">
+      <div id="nameField">
+        <label for="authName">Name</label>
+        <input type="text" id="authName" autocomplete="name" />
+      </div>
+      <label for="authEmail">Email</label>
+      <input type="email" id="authEmail" autocomplete="email" required />
+      <label for="authPassword">Password</label>
+      <input type="password" id="authPassword" autocomplete="current-password" minlength="8" required />
+      <button type="submit" class="btn" id="authSubmit">Create account</button>
+    </form>
+    <p class="modal-switch" id="authSwitch">Already have an account? <a id="authToggle">Log in</a></p>
+  </div>
+</div>
+
+<!-- APP / DASHBOARD -->
+<div class="app-overlay" id="appOverlay" role="region" aria-label="LocalLead dashboard">
+  <div class="app-bar">
+    <a href="#" class="logo" id="appLogo">LOCAL<b>LEAD</b><span class="dot">.</span></a>
+    <div class="app-actions">
+      <span class="usage" id="appUsage"></span>
+      <button class="btn btn-outline" id="appExport">Export CSV</button>
+      <button class="btn" id="appClose">Close</button>
+      <button class="btn btn-outline" id="appLogout">Log out</button>
+    </div>
+  </div>
+  <div class="app-main">
+    <form class="search-form" id="searchForm">
+      <div class="field">
+        <label for="qCategory">Business category</label>
+        <input type="text" id="qCategory" placeholder="plumbers" required />
+      </div>
+      <div class="field">
+        <label for="qCity">City or zip</label>
+        <input type="text" id="qCity" placeholder="Orlando, FL" required />
+      </div>
+      <button type="submit" class="btn btn-shadow" id="searchBtn">Find Leads →</button>
+    </form>
+    <div class="app-status" id="appStatus"></div>
+    <div class="pipeline-tabs" id="pipelineTabs">
+      <button data-status="" class="active">All</button>
+      <button data-status="new">New</button>
+      <button data-status="contacted">Contacted</button>
+      <button data-status="replied">Replied</button>
+      <button data-status="meeting">Meeting</button>
+      <button data-status="closed">Closed</button>
+    </div>
+    <div class="app-results" id="appResults"></div>
+  </div>
+</div>
+
+<script>
+  // ---------- API client ----------
+  const API = '';
+  const TOKEN_KEY = 'll_token';
+  const getToken = () => localStorage.getItem(TOKEN_KEY);
+  const setToken = (t) => localStorage.setItem(TOKEN_KEY, t);
+  const clearToken = () => localStorage.removeItem(TOKEN_KEY);
+
+  async function api(path, { method = 'GET', body, auth = true } = {}) {
+    const headers = {};
+    if (body) headers['Content-Type'] = 'application/json';
+    if (auth && getToken()) headers['Authorization'] = 'Bearer ' + getToken();
+    const res = await fetch(API + path, { method, headers, body: body ? JSON.stringify(body) : undefined });
+    if (!res.ok) {
+      let detail = 'Something went wrong.';
+      try { detail = (await res.json()).detail || detail; } catch (e) {}
+      const err = new Error(typeof detail === 'string' ? detail : 'Request failed');
+      err.status = res.status;
+      throw err;
+    }
+    return res.status === 204 ? null : res.json();
+  }
+
+  // ---------- Auth modal ----------
+  let authMode = 'signup';
+  let pendingPlan = null;       // plan to checkout after auth
+  let openAppAfterAuth = false; // open dashboard after auth
+  const authModal = document.getElementById('authModal');
+  const authError = document.getElementById('authError');
+
+  function showAuth(mode = 'signup') {
+    authMode = mode;
+    document.getElementById('authTitle').textContent = mode === 'signup' ? 'Start free.' : 'Welcome back.';
+    document.getElementById('authSub').textContent = mode === 'signup'
+      ? 'Free forever for the first 100 freelancers. No card.'
+      : 'Log in to find your next 50 clients.';
+    document.getElementById('nameField').style.display = mode === 'signup' ? 'block' : 'none';
+    document.getElementById('authName').required = mode === 'signup';
+    document.getElementById('authSubmit').textContent = mode === 'signup' ? 'Create account' : 'Log in';
+    document.getElementById('authSwitch').innerHTML = mode === 'signup'
+      ? 'Already have an account? <a id="authToggle">Log in</a>'
+      : "Don't have an account? <a id=\"authToggle\">Sign up</a>";
+    document.getElementById('authPassword').setAttribute('autocomplete', mode === 'signup' ? 'new-password' : 'current-password');
+    bindToggle();
+    authError.classList.remove('show');
+    authModal.classList.add('open');
+    document.getElementById('authEmail').focus();
+  }
+  function hideAuth() { authModal.classList.remove('open'); }
+  function bindToggle() {
+    document.getElementById('authToggle').onclick = () => showAuth(authMode === 'signup' ? 'login' : 'signup');
+  }
+  document.getElementById('authClose').onclick = hideAuth;
+  authModal.addEventListener('click', (e) => { if (e.target === authModal) hideAuth(); });
+
+  document.getElementById('authForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    authError.classList.remove('show');
+    const name = document.getElementById('authName').value.trim();
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const btn = document.getElementById('authSubmit');
+    btn.disabled = true; btn.textContent = 'Working…';
+    try {
+      const path = authMode === 'signup' ? '/api/auth/signup' : '/api/auth/login';
+      const payload = authMode === 'signup' ? { name, email, password } : { email, password };
+      const data = await api(path, { method: 'POST', body: payload, auth: false });
+      setToken(data.access_token);
+      hideAuth();
+      if (pendingPlan) { const p = pendingPlan; pendingPlan = null; startCheckout(p); }
+      else if (openAppAfterAuth) { openAppAfterAuth = false; openApp(); }
+      else { openApp(); }
+    } catch (err) {
+      authError.textContent = err.message;
+      authError.classList.add('show');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = authMode === 'signup' ? 'Create account' : 'Log in';
+    }
+  });
+
+  // ---------- Plan / checkout ----------
+  async function startCheckout(plan) {
+    if (plan === 'starter') { openApp(); return; }
+    if (!getToken()) { pendingPlan = plan; showAuth('signup'); return; }
+    try {
+      const { checkout_url } = await api('/api/billing/checkout', { method: 'POST', body: { plan } });
+      window.location.href = checkout_url;
+    } catch (err) {
+      if (err.status === 401) { pendingPlan = plan; showAuth('login'); return; }
+      alert('Checkout unavailable: ' + err.message);
+    }
+  }
+
+  // ---------- Dashboard ----------
+  const appOverlay = document.getElementById('appOverlay');
+  let currentStatus = '';
+
+  async function openApp() {
+    if (!getToken()) { openAppAfterAuth = true; showAuth('signup'); return; }
+    appOverlay.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    try {
+      await refreshUsage();
+      await loadLeads();
+    } catch (err) {
+      if (err.status === 401) { clearToken(); closeApp(); showAuth('login'); }
+    }
+  }
+  function closeApp() { appOverlay.classList.remove('open'); document.body.style.overflow = ''; }
+  document.getElementById('appClose').onclick = closeApp;
+  document.getElementById('appLogo').onclick = (e) => { e.preventDefault(); };
+  document.getElementById('appLogout').onclick = () => { clearToken(); closeApp(); };
+  document.getElementById('appExport').onclick = exportCsv;
+
+  async function refreshUsage() {
+    const me = await api('/api/auth/me');
+    const planNames = { starter: 'Starter', pro: 'Pro', agency: 'Agency' };
+    const limit = me.plan === 'starter' ? 10 : '∞';
+    document.getElementById('appUsage').innerHTML =
+      `${planNames[me.plan] || me.plan} · <b>${me.searches_used}</b>/${limit} searches`;
+  }
+
+  const statusEl = document.getElementById('appStatus');
+  function setStatus(msg, isErr = false) {
+    statusEl.textContent = msg || '';
+    statusEl.classList.toggle('err', !!isErr);
+  }
+
+  document.getElementById('searchForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const category = document.getElementById('qCategory').value.trim();
+    const city = document.getElementById('qCity').value.trim();
+    if (!category || !city) return;
+    const btn = document.getElementById('searchBtn');
+    btn.disabled = true; btn.textContent = 'Scanning…';
+    setStatus('Scanning every business and auditing their sites… this can take a few seconds.');
+    try {
+      const data = await api('/api/search', { method: 'POST', body: { category, city, limit: 20 } });
+      currentStatus = '';
+      setActiveTab('');
+      renderLeads(data.leads);
+      setStatus(`${data.count} leads found for "${data.query}". Sorted by opportunity score.`);
+      await refreshUsage();
+    } catch (err) {
+      setStatus(err.message, true);
+    } finally {
+      btn.disabled = false; btn.textContent = 'Find Leads →';
+    }
+  });
+
+  async function loadLeads() {
+    const leads = await api('/api/leads' + (currentStatus ? '?status=' + currentStatus : ''));
+    renderLeads(leads);
+  }
+
+  function setActiveTab(status) {
+    currentStatus = status;
+    document.querySelectorAll('#pipelineTabs button').forEach((b) => {
+      b.classList.toggle('active', (b.dataset.status || '') === status);
+    });
+  }
+  document.querySelectorAll('#pipelineTabs button').forEach((b) => {
+    b.onclick = async () => { setActiveTab(b.dataset.status || ''); await loadLeads(); };
+  });
+
+  const STATUSES = ['new', 'contacted', 'replied', 'meeting', 'closed'];
+  function scoreColor(s) { return s >= 80 ? 'var(--red)' : s >= 60 ? 'var(--orange)' : 'var(--gray)'; }
+  function esc(s) { return (s == null ? '' : String(s)).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+  function renderLeads(leads) {
+    const box = document.getElementById('appResults');
+    box.innerHTML = '';
+    leads.forEach((l) => {
+      const issues = (l.audit || []).filter((f) => f.failed);
+      const chips = issues.map((f) => `<span class="chip red">${esc(f.label)}</span>`).join('');
+      const opts = STATUSES.map((s) => `<option value="${s}"${s === l.status ? ' selected' : ''}>${s}</option>`).join('');
+      const web = l.website ? `<a href="${esc(l.website)}" target="_blank" rel="noopener">site</a>` : 'no website';
+      const row = document.createElement('div');
+      row.className = 'res-row';
+      row.innerHTML = `
+        <div class="res-info">
+          <div class="res-name">${esc(l.name)}</div>
+          <div class="res-meta">${esc(l.address || '')}${l.phone ? ' · ' + esc(l.phone) : ''} · ${web}${l.review_count != null ? ' · ' + l.review_count + ' reviews' : ''}</div>
+          <div class="chips">${chips || '<span class="chip plain">No issues found</span>'}</div>
+        </div>
+        <div class="res-right">
+          <div class="res-score" style="color:${scoreColor(l.score || 0)}">${l.score != null ? l.score : '—'}</div>
+          <div class="res-controls">
+            <select data-id="${l.id}" class="statusSel">${opts}</select>
+            <button class="res-del" data-id="${l.id}">del</button>
+          </div>
+        </div>`;
+      box.appendChild(row);
+    });
+    box.querySelectorAll('.statusSel').forEach((sel) => {
+      sel.onchange = async () => {
+        try { await api('/api/leads/' + sel.dataset.id, { method: 'PATCH', body: { status: sel.value } }); }
+        catch (err) { setStatus(err.message, true); }
+      };
+    });
+    box.querySelectorAll('.res-del').forEach((b) => {
+      b.onclick = async () => {
+        try { await api('/api/leads/' + b.dataset.id, { method: 'DELETE' }); await loadLeads(); }
+        catch (err) { setStatus(err.message, true); }
+      };
+    });
+  }
+
+  async function exportCsv() {
+    try {
+      const res = await fetch(API + '/api/leads/export.csv', { headers: { Authorization: 'Bearer ' + getToken() } });
+      if (!res.ok) throw new Error('Export failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'locallead-leads.csv'; a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) { setStatus('Export failed: ' + err.message, true); }
+  }
+
+  // ---------- Wire CTA buttons ----------
+  document.querySelectorAll('[data-action="auth"]').forEach((el) =>
+    el.addEventListener('click', (e) => { e.preventDefault(); getToken() ? openApp() : showAuth('signup'); }));
+  document.querySelectorAll('[data-action="app"]').forEach((el) =>
+    el.addEventListener('click', (e) => { e.preventDefault(); openApp(); }));
+  document.querySelectorAll('[data-plan]').forEach((el) =>
+    el.addEventListener('click', (e) => { e.preventDefault(); startCheckout(el.dataset.plan); }));
+
+  // Resume an upgrade flow flagged before a Stripe redirect; show app on return.
+  if (new URLSearchParams(location.search).get('checkout') === 'success' && getToken()) openApp();
+
+  // Esc closes modal / app
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') { if (authModal.classList.contains('open')) hideAuth(); else if (appOverlay.classList.contains('open')) closeApp(); }
+  });
+</script>
 
 <script>
   // Scroll reveal
