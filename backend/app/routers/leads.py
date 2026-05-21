@@ -13,6 +13,7 @@ from ..models import LEAD_STATUSES, Lead, User
 from ..schemas import LeadOut, LeadUpdate, SearchRequest, SearchResponse
 from ..services import places
 from ..services.audit import audit_website
+from ..services.report import build_report
 from ..services.scoring import score_lead
 from ..usage import can_search, record_search, search_limit
 
@@ -20,19 +21,22 @@ router = APIRouter(prefix="/api", tags=["leads"])
 
 
 def _audit_and_score(biz: dict) -> dict:
-    flags, _meta = audit_website(biz.get("website"), biz.get("review_count"))
+    flags, meta = audit_website(biz.get("website"), biz.get("review_count"))
     biz["audit"] = flags
     biz["score"] = score_lead(flags, biz.get("review_count"), biz.get("rating"))
+    biz["contacts"] = meta.get("contacts", {"email": None, "socials": []})
     return biz
 
 
 def _lead_to_out(lead: Lead) -> LeadOut:
     audit = json.loads(lead.audit_json) if lead.audit_json else []
+    socials = json.loads(lead.contact_socials) if lead.contact_socials else []
     return LeadOut(
         id=lead.id, place_id=lead.place_id, name=lead.name, address=lead.address,
         phone=lead.phone, website=lead.website, category=lead.category, city=lead.city,
         rating=lead.rating, review_count=lead.review_count, score=lead.score,
-        status=lead.status, notes=lead.notes, created_at=lead.created_at, audit=audit,
+        status=lead.status, notes=lead.notes, contact_email=lead.contact_email,
+        contact_socials=socials, created_at=lead.created_at, audit=audit,
     )
 
 
@@ -83,6 +87,12 @@ def search(payload: SearchRequest, db: Session = Depends(get_db), user: User = D
         lead.review_count = biz.get("review_count")
         lead.audit_json = json.dumps(biz.get("audit", []))
         lead.score = biz.get("score")
+        contacts = biz.get("contacts") or {}
+        # Don't overwrite a found contact with nothing on a re-scan.
+        if contacts.get("email"):
+            lead.contact_email = contacts["email"]
+        if contacts.get("socials"):
+            lead.contact_socials = json.dumps(contacts["socials"])
         db.flush()
         out_leads.append(_lead_to_out(lead))
 
@@ -138,19 +148,41 @@ def delete_lead(lead_id: int, db: Session = Depends(get_db), user: User = Depend
     db.commit()
 
 
+@router.get("/leads/{lead_id}/report.pdf")
+def lead_report(
+    lead_id: int,
+    brand: str | None = Query(default=None),
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+):
+    lead = db.query(Lead).filter(Lead.id == lead_id, Lead.user_id == user.id).first()
+    if not lead:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lead not found")
+    # White-label branding is an Agency-plan perk; everyone else gets "LocalLead".
+    label = brand.strip() if (brand and user.plan == "agency") else "LocalLead"
+    pdf = build_report(lead, brand=label or "LocalLead")
+    filename = f"audit-{(lead.name or 'lead').lower().replace(' ', '-')[:40]}.pdf"
+    return StreamingResponse(
+        iter([pdf]),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @router.get("/leads/export.csv")
 def export_csv(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     leads = db.query(Lead).filter(Lead.user_id == user.id).order_by(Lead.score.desc().nullslast()).all()
     buf = io.StringIO()
     writer = csv.writer(buf)
     writer.writerow(
-        ["name", "score", "status", "phone", "website", "address", "city", "rating", "review_count", "issues", "notes"]
+        ["name", "score", "status", "phone", "email", "website", "address", "city",
+         "rating", "review_count", "issues", "notes"]
     )
     for l in leads:
         audit = json.loads(l.audit_json) if l.audit_json else []
         issues = "; ".join(f["label"] for f in audit if f.get("failed"))
         writer.writerow(
-            [l.name, l.score, l.status, l.phone, l.website, l.address, l.city,
+            [l.name, l.score, l.status, l.phone, l.contact_email or "", l.website, l.address, l.city,
              l.rating, l.review_count, issues, l.notes or ""]
         )
     buf.seek(0)

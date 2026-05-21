@@ -1122,18 +1122,20 @@
       const chips = issues.map((f) => `<span class="chip red">${esc(f.label)}</span>`).join('');
       const opts = STATUSES.map((s) => `<option value="${s}"${s === l.status ? ' selected' : ''}>${s}</option>`).join('');
       const web = l.website ? `<a href="${esc(l.website)}" target="_blank" rel="noopener">site</a>` : 'no website';
+      const email = l.contact_email ? ` · <a href="mailto:${esc(l.contact_email)}">${esc(l.contact_email)}</a>` : '';
       const row = document.createElement('div');
       row.className = 'res-row';
       row.innerHTML = `
         <div class="res-info">
           <div class="res-name">${esc(l.name)}</div>
-          <div class="res-meta">${esc(l.address || '')}${l.phone ? ' · ' + esc(l.phone) : ''} · ${web}${l.review_count != null ? ' · ' + l.review_count + ' reviews' : ''}</div>
+          <div class="res-meta">${esc(l.address || '')}${l.phone ? ' · ' + esc(l.phone) : ''} · ${web}${email}${l.review_count != null ? ' · ' + l.review_count + ' reviews' : ''}</div>
           <div class="chips">${chips || '<span class="chip plain">No issues found</span>'}</div>
         </div>
         <div class="res-right">
           <div class="res-score" style="color:${scoreColor(l.score || 0)}">${l.score != null ? l.score : '—'}</div>
           <div class="res-controls">
             <select data-id="${l.id}" class="statusSel">${opts}</select>
+            <button class="res-pdf res-del" data-id="${l.id}" title="Download branded audit PDF">PDF</button>
             <button class="res-del" data-id="${l.id}">del</button>
           </div>
         </div>`;
@@ -1145,12 +1147,27 @@
         catch (err) { setStatus(err.message, true); }
       };
     });
-    box.querySelectorAll('.res-del').forEach((b) => {
+    box.querySelectorAll('.res-del:not(.res-pdf)').forEach((b) => {
       b.onclick = async () => {
         try { await api('/api/leads/' + b.dataset.id, { method: 'DELETE' }); await loadLeads(); }
         catch (err) { setStatus(err.message, true); }
       };
     });
+    box.querySelectorAll('.res-pdf').forEach((b) => {
+      b.onclick = () => downloadFile('/api/leads/' + b.dataset.id + '/report.pdf', 'audit.pdf');
+    });
+  }
+
+  async function downloadFile(path, fallbackName) {
+    try {
+      const res = await fetch(API + path, { headers: { Authorization: 'Bearer ' + getToken() } });
+      if (!res.ok) throw new Error('Download failed');
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = fallbackName; a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) { setStatus('Download failed: ' + err.message, true); }
   }
 
   async function exportCsv() {

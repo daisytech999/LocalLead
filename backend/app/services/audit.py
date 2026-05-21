@@ -19,8 +19,41 @@ TIMEOUT = httpx.Timeout(12.0, connect=6.0)
 SLOW_THRESHOLD_S = 3.0
 
 
+EMAIL_RE = re.compile(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}")
+SOCIAL_DOMAINS = ("facebook.com", "instagram.com", "twitter.com", "x.com", "linkedin.com", "youtube.com", "tiktok.com")
+SKIP_EMAIL_HINTS = ("sentry", "wixpress", "example.com", ".png", ".jpg", ".gif", "@2x")
+
+
 def _flag(key: str, label: str, failed: bool, detail: str | None = None) -> dict:
     return {"key": key, "label": label, "failed": failed, "detail": detail}
+
+
+def extract_contacts(html: str) -> dict:
+    """Pull a best-guess contact email and social profile links from page HTML."""
+    if not html:
+        return {"email": None, "socials": []}
+
+    emails: list[str] = []
+    # Prefer mailto: links, then fall back to scanning text.
+    for m in re.findall(r'mailto:([^"\'>?\s]+)', html, re.I):
+        emails.append(m)
+    if not emails:
+        emails = EMAIL_RE.findall(html)
+    clean = []
+    for e in emails:
+        el = e.lower().strip(".,;:")
+        if any(h in el for h in SKIP_EMAIL_HINTS):
+            continue
+        if el not in clean:
+            clean.append(el)
+
+    socials = []
+    for href in re.findall(r'href=["\']([^"\']+)["\']', html, re.I):
+        low = href.lower()
+        if any(d in low for d in SOCIAL_DOMAINS) and href not in socials:
+            socials.append(href.split("?")[0])
+
+    return {"email": clean[0] if clean else None, "socials": socials[:5]}
 
 
 def _check_ssl_expiry(hostname: str) -> tuple[bool, str | None]:
@@ -54,6 +87,7 @@ def audit_website(website: str | None, review_count: int | None = None) -> tuple
         # Without a site, most site-level checks are moot; surface review signal only.
         _append_review_flags(flags, review_count)
         meta["reachable"] = False
+        meta["contacts"] = {"email": None, "socials": []}
         return flags, meta
 
     url = website.strip()
@@ -161,6 +195,7 @@ def audit_website(website: str | None, review_count: int | None = None) -> tuple
     )
 
     _append_review_flags(flags, review_count)
+    meta["contacts"] = extract_contacts(html)
     return flags, meta
 
 

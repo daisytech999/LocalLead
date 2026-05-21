@@ -64,6 +64,10 @@ class Lead(Base):
     audit_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     score: Mapped[int | None] = mapped_column(Integer, index=True, nullable=True)
 
+    # Contact finder: extracted from the lead's website during audit.
+    contact_email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    contact_socials: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON list
+
     # Pipeline / mini-CRM.
     status: Mapped[str] = mapped_column(String(20), default="new", nullable=False)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -71,3 +75,19 @@ class Lead(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)
 
     owner: Mapped["User"] = relationship(back_populates="leads")
+
+
+class SavedSearch(Base):
+    """A city + category a user watches for new-lead alerts."""
+
+    __tablename__ = "saved_searches"
+    __table_args__ = (UniqueConstraint("user_id", "category", "city", name="uq_watch"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True, nullable=False)
+    category: Mapped[str] = mapped_column(String(120), nullable=False)
+    city: Mapped[str] = mapped_column(String(160), nullable=False)
+    # JSON list of place_ids seen on the last scan, to detect new ones.
+    seen_place_ids: Mapped[str | None] = mapped_column(Text, nullable=True)
+    last_scanned_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utcnow, nullable=False)

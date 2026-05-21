@@ -59,6 +59,8 @@ class LeadOut(BaseModel):
     score: int | None
     status: str
     notes: str | None
+    contact_email: str | None = None
+    contact_socials: list[str] = []
     created_at: datetime
     audit: list[AuditFlag] = []
 
