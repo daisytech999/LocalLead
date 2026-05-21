@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>LocalLead — Find the local businesses in your city that need you</title>
+<meta name="description" content="Enter a city + business category and instantly see every local business with a broken site, no website, or weak SEO. Full automated audit + opportunity score. Built for freelancers, priced like it." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --cream: #f4f1ea;
+    --ink: #0a0a0a;
+    --red: #d63838;
+    --yellow: #ffd400;
+    --orange: #e87d2a;
+    --gray: #8a8a82;
+    --green: #2f9e44;
+    --border: 1.5px solid var(--ink);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  .grain {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0.07;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  h1, h2, h3, .anton {
+    font-family: 'Anton', sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+  }
+
+  .serif { font-family: 'Instrument Serif', serif; font-style: italic; }
+
+  a { color: inherit; text-decoration: none; }
+
+  .strike { text-decoration: line-through; text-decoration-color: var(--red); text-decoration-thickness: 4px; }
+
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 0 28px; }
+
+  /* ---------- NAV ---------- */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--cream);
+    border-bottom: var(--border);
+  }
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 0 28px;
+  }
+  .logo {
+    font-family: 'Anton', sans-serif;
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .logo b { font-weight: 400; }
+  .logo .dot { color: var(--red); }
+  .nav-links { display: flex; align-items: center; gap: 26px; }
+  .nav-links a {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--red); }
+  .btn {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 13px;
+    padding: 11px 20px;
+    border: var(--border);
+    background: var(--ink);
+    color: var(--cream);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn:hover { background: var(--yellow); color: var(--ink); }
+  .btn-outline { background: transparent; color: var(--ink); }
+  .btn-outline:hover { background: var(--ink); color: var(--cream); }
+  .nav-toggle { display: none; background: none; border: none; cursor: pointer; }
+
+  /* shadow buttons */
+  .btn-shadow {
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .btn-shadow:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+
+  /* ---------- HERO ---------- */
+  .hero { padding: 70px 0 60px; border-bottom: var(--border); }
+  .badge {
+    display: inline-block;
+    border: var(--border);
+    padding: 7px 14px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin-bottom: 34px;
+    background: var(--yellow);
+  }
+  .hero h1 {
+    font-size: clamp(48px, 12vw, 168px);
+    margin-bottom: 30px;
+  }
+  .hero h1 .serif { color: var(--red); text-transform: none; }
+  .hero-sub {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: clamp(20px, 2.4vw, 28px);
+    line-height: 1.35;
+    max-width: 760px;
+    margin-bottom: 38px;
+  }
+  .hero-ctas { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 22px; }
+  .btn-lg { font-size: 15px; padding: 16px 28px; }
+  .footnote { font-size: 13px; color: var(--ink); opacity: 0.7; }
+
+  /* ---------- MARQUEE ---------- */
+  .marquee {
+    background: var(--ink);
+    color: var(--cream);
+    overflow: hidden;
+    white-space: nowrap;
+    border-bottom: var(--border);
+    padding: 16px 0;
+  }
+  .marquee-track {
+    display: inline-block;
+    white-space: nowrap;
+    animation: marquee 26s linear infinite;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    font-size: 26px;
+    letter-spacing: 0.03em;
+  }
+  .marquee-track span { padding: 0 6px; }
+  .marquee .sep { color: var(--red); }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  /* ---------- SECTION SHARED ---------- */
+  section { position: relative; }
+  .sec-label {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sec-label::before {
+    content: "";
+    width: 36px;
+    height: 3px;
+    background: var(--red);
+    display: inline-block;
+  }
+  .pad { padding: 84px 0; }
+  .divider { border-bottom: var(--border); }
+
+  /* ---------- MANIFESTO ---------- */
+  .manifesto h2 {
+    font-size: clamp(34px, 5.4vw, 76px);
+    max-width: 1000px;
+    margin-bottom: 50px;
+  }
+  .manifesto h2 .serif { color: var(--red); text-transform: none; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; }
+  .manifesto .two-col p {
+    font-family: 'Instrument Serif', serif;
+    font-size: 21px;
+    line-height: 1.45;
+    margin-bottom: 22px;
+  }
+  .manifesto em, .manifesto .it { font-style: italic; }
+  .pullquote {
+    border-left: 6px solid var(--red);
+    padding: 8px 0 8px 26px;
+    margin: 30px 0;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    font-size: 24px;
+    line-height: 1.1;
+  }
+
+  /* ---------- HOW ---------- */
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: var(--border); }
+  .how-step {
+    padding: 40px 32px 46px;
+    border-right: var(--border);
+    transition: background 0.18s ease;
+    min-height: 280px;
+  }
+  .how-step:last-child { border-right: none; }
+  .how-step:hover { background: var(--yellow); }
+  .how-num { font-family: 'Anton', sans-serif; font-size: 96px; color: var(--red); line-height: 0.85; margin-bottom: 18px; }
+  .how-step h3 { font-size: 26px; margin-bottom: 14px; }
+  .how-step p { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 19px; line-height: 1.4; }
+
+  /* ---------- DEMO ---------- */
+  .demo-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 56px; align-items: start; }
+  .demo-left h2 { font-size: clamp(34px, 4.4vw, 60px); margin-bottom: 22px; }
+  .demo-left h2 .serif { color: var(--red); text-transform: none; }
+  .demo-left p { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 21px; line-height: 1.45; max-width: 420px; }
+  .demo-card {
+    border: var(--border);
+    background: #fff;
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .demo-head {
+    background: var(--ink);
+    color: var(--cream);
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    padding: 13px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .live-dot {
+    width: 11px; height: 11px; border-radius: 50%;
+    background: var(--red);
+    display: inline-block;
+    animation: pulse 1.3s infinite;
+    flex-shrink: 0;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(214,56,56,0.7); }
+    70% { box-shadow: 0 0 0 8px rgba(214,56,56,0); }
+    100% { box-shadow: 0 0 0 0 rgba(214,56,56,0); }
+  }
+  .lead-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 16px 18px;
+    border-bottom: var(--border);
+  }
+  .lead-row:last-child { border-bottom: none; }
+  .lead-info { flex: 1; min-width: 0; }
+  .lead-name { font-family: 'Anton', sans-serif; text-transform: uppercase; font-size: 20px; line-height: 1; margin-bottom: 5px; }
+  .lead-meta { font-size: 12px; color: var(--gray); margin-bottom: 9px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 3px 7px;
+    border: 1.5px solid var(--ink);
+  }
+  .chip.red { background: var(--red); color: #fff; border-color: var(--red); }
+  .chip.yellow { background: var(--yellow); color: var(--ink); border-color: var(--ink); }
+  .chip.black { background: var(--ink); color: var(--cream); }
+  .chip.plain { background: transparent; }
+  .lead-score { font-family: 'Anton', sans-serif; font-size: 48px; line-height: 0.8; flex-shrink: 0; }
+  .score-red { color: var(--red); }
+  .score-orange { color: var(--orange); }
+  .score-gray { color: var(--gray); }
+
+  /* ---------- FEATURES ---------- */
+  .feat-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: var(--border); border-left: var(--border); }
+  .feat {
+    padding: 34px 28px 40px;
+    border-right: var(--border);
+    border-bottom: var(--border);
+    transition: background 0.18s ease;
+  }
+  .feat:hover { background: var(--yellow); }
+  .feat-num { font-size: 13px; font-weight: 800; color: var(--red); margin-bottom: 16px; }
+  .feat h3 { font-size: 22px; margin-bottom: 12px; }
+  .feat p { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 18px; line-height: 1.4; }
+
+  /* ---------- VS ---------- */
+  .vs h2 { font-size: clamp(32px, 5vw, 66px); max-width: 920px; margin-bottom: 46px; }
+  .vs h2 .serif { color: var(--red); text-transform: none; }
+  .cmp { width: 100%; border-collapse: collapse; border: var(--border); }
+  .cmp th, .cmp td { border: var(--border); padding: 16px 18px; text-align: left; vertical-align: top; font-size: 14px; }
+  .cmp thead th { font-family: 'Anton', sans-serif; text-transform: uppercase; font-size: 19px; letter-spacing: 0.03em; }
+  .cmp thead th:nth-child(1) { background: var(--cream); width: 30%; }
+  .cmp thead th.col-buddy { background: var(--ink); color: var(--cream); }
+  .cmp thead th.col-ll { background: var(--red); color: #fff; }
+  .cmp tbody td:first-child { font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.04em; }
+  .cmp .yes { color: var(--green); font-weight: 800; }
+  .cmp .no { color: var(--red); font-weight: 800; }
+  .vs-note { margin-top: 24px; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 19px; max-width: 740px; }
+
+  /* ---------- DARK AUDIT ---------- */
+  .dark { background: var(--ink); color: var(--cream); border-top: var(--border); border-bottom: var(--border); }
+  .dark .sec-label::before { background: var(--yellow); }
+  .dark h2 { font-size: clamp(34px, 5.4vw, 76px); max-width: 900px; margin-bottom: 50px; color: var(--cream); }
+  .dark h2 .serif { color: var(--yellow); text-transform: none; }
+  .audit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1.5px solid #333; }
+  .audit-item {
+    padding: 26px 28px;
+    border-right: 1.5px solid #333;
+    border-bottom: 1.5px solid #333;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+  .audit-item:nth-child(2n) { border-right: none; }
+  .audit-item:nth-last-child(-n+2) { border-bottom: none; }
+  .audit-ico { color: var(--red); font-size: 18px; line-height: 1.2; flex-shrink: 0; margin-top: 2px; }
+  .audit-item h3 { font-size: 19px; margin-bottom: 7px; color: var(--cream); }
+  .audit-item p { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 17px; line-height: 1.35; color: #cfcabd; }
+
+  /* ---------- PRICING ---------- */
+  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border: var(--border); }
+  .plan {
+    padding: 38px 30px 40px;
+    border-right: var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+  .plan:last-child { border-right: none; }
+  .plan.featured { background: var(--ink); color: var(--cream); position: relative; }
+  .plan.featured .plan-price { color: var(--yellow); }
+  .popular-tag {
+    position: absolute; top: 0; right: 0;
+    background: var(--yellow); color: var(--ink);
+    font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 5px 10px;
+  }
+  .plan-name { font-family: 'Anton', sans-serif; text-transform: uppercase; font-size: 26px; margin-bottom: 8px; }
+  .plan-price { font-family: 'Anton', sans-serif; font-size: 56px; line-height: 0.9; margin-bottom: 4px; }
+  .plan-price small { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 500; }
+  .plan-bill { font-size: 12px; color: var(--gray); margin-bottom: 24px; }
+  .plan.featured .plan-bill { color: #b9b4a8; }
+  .plan ul { list-style: none; margin-bottom: 28px; flex: 1; }
+  .plan li { font-size: 13.5px; padding: 8px 0; border-bottom: 1.5px dotted rgba(0,0,0,0.18); display: flex; gap: 9px; }
+  .plan.featured li { border-bottom-color: rgba(255,255,255,0.18); }
+  .plan li::before { content: "→"; color: var(--red); font-weight: 700; }
+  .plan.featured li::before { color: var(--yellow); }
+  .plan .btn { width: 100%; text-align: center; }
+  .plan.featured .btn { background: var(--yellow); color: var(--ink); }
+  .plan.featured .btn:hover { background: var(--cream); }
+  .price-note { margin-top: 24px; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 18px; text-align: center; }
+
+  /* ---------- FAQ ---------- */
+  .faq h2 { font-size: clamp(34px, 5.4vw, 72px); margin-bottom: 44px; }
+  details {
+    border-bottom: var(--border);
+  }
+  details:first-of-type { border-top: var(--border); }
+  summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 22px 4px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    font-family: 'Anton', sans-serif;
+    text-transform: uppercase;
+    font-size: 21px;
+    letter-spacing: 0.01em;
+  }
+  summary::-webkit-details-marker { display: none; }
+  .faq-plus {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    line-height: 1;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+    color: var(--red);
+  }
+  details[open] .faq-plus { transform: rotate(135deg); }
+  details summary:hover { color: var(--red); }
+  .faq-body {
+    padding: 0 4px 24px;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 19px;
+    line-height: 1.45;
+    max-width: 820px;
+  }
+
+  /* ---------- FINAL CTA ---------- */
+  .final {
+    background: var(--red);
+    color: var(--cream);
+    text-align: center;
+    padding: 100px 0;
+    border-top: var(--border);
+    border-bottom: var(--border);
+  }
+  .final h2 { font-size: clamp(38px, 8vw, 110px); max-width: 1100px; margin: 0 auto 26px; color: #fff; }
+  .final h2 .serif { color: var(--yellow); text-transform: none; }
+  .final p { font-family: 'Instrument Serif', serif; font-style: italic; font-size: clamp(20px, 2.4vw, 26px); margin-bottom: 40px; }
+  .btn-cream {
+    background: var(--cream); color: var(--ink); border: var(--border);
+    font-size: 17px; padding: 20px 38px;
+    box-shadow: 8px 8px 0 var(--ink);
+  }
+  .btn-cream:hover { background: var(--yellow); transform: translate(-3px, -3px); box-shadow: 11px 11px 0 var(--ink); }
+
+  /* ---------- FOOTER ---------- */
+  footer { background: var(--ink); color: var(--cream); padding: 64px 0 40px; }
+  .foot-grid { display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 48px; }
+  .foot-logo { font-family: 'Anton', sans-serif; font-size: 28px; text-transform: uppercase; margin-bottom: 16px; }
+  .foot-logo .dot { color: var(--red); }
+  .foot-tag { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 19px; max-width: 320px; color: #cfcabd; }
+  .foot-col h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em; color: var(--yellow); margin-bottom: 16px; font-weight: 700; }
+  .foot-col a { display: block; font-size: 13.5px; padding: 6px 0; color: #cfcabd; transition: color 0.15s; }
+  .foot-col a:hover { color: var(--cream); }
+  .foot-bottom { border-top: 1.5px solid #333; padding-top: 26px; font-size: 12.5px; color: var(--gray); }
+
+  /* ---------- REVEAL ---------- */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 968px) {
+    .nav-links { gap: 18px; }
+    .nav-links a:not(.btn) { display: none; }
+    .nav-toggle { display: block; }
+    .grid-3 { grid-template-columns: 1fr; }
+    .how-step { border-right: none; border-bottom: var(--border); }
+    .how-step:last-child { border-bottom: none; }
+    .feat-grid { grid-template-columns: 1fr 1fr; }
+    .demo-grid { grid-template-columns: 1fr; gap: 36px; }
+    .two-col { grid-template-columns: 1fr; gap: 0; }
+    .foot-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 768px) {
+    .price-grid { grid-template-columns: 1fr; }
+    .plan { border-right: none; border-bottom: var(--border); }
+    .plan:last-child { border-bottom: none; }
+    .audit-grid { grid-template-columns: 1fr; }
+    .audit-item { border-right: none; }
+    .audit-item:nth-last-child(2) { border-bottom: 1.5px solid #333; }
+    .cmp, .cmp thead, .cmp tbody, .cmp th, .cmp td, .cmp tr { display: block; }
+    .cmp thead { display: none; }
+    .cmp tbody td { border: none; border-bottom: 1.5px dotted rgba(0,0,0,0.25); }
+    .cmp tbody tr { border: var(--border); margin-bottom: -1.5px; padding: 6px 0; }
+    .cmp tbody td:first-child { background: var(--cream); font-size: 13px; }
+    .cmp tbody td[data-col]::before { content: attr(data-col) ": "; font-weight: 700; text-transform: uppercase; font-size: 11px; }
+  }
+  @media (max-width: 600px) {
+    .wrap { padding: 0 18px; }
+    .nav-inner { padding: 0 18px; }
+    .feat-grid { grid-template-columns: 1fr; }
+    .foot-grid { grid-template-columns: 1fr; }
+    .pad { padding: 60px 0; }
+    .marquee-track { font-size: 20px; }
+    .lead-name { font-size: 16px; }
+    .lead-score { font-size: 38px; }
+    .hero { padding: 48px 0 44px; }
+  }
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#top" class="logo">LOCAL<b>LEAD</b><span class="dot">.</span></a>
+    <div class="nav-links">
+      <a href="#manifesto">Manifesto</a>
+      <a href="#how">How</a>
+      <a href="#features">Features</a>
+      <a href="#vs">vs Buddy</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="#pricing" class="btn">Try Free</a>
+    </div>
+    <button class="nav-toggle btn-outline btn" id="navToggle" aria-label="Toggle menu">Menu</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <span class="badge reveal">★ For freelancers tired of the grind</span>
+    <h1 class="reveal">Stop scrolling <span class="strike">Google Maps</span> <span class="serif">for hours.</span></h1>
+    <p class="hero-sub reveal">Every city has hundreds of local businesses with broken sites, no websites, or weak SEO. You're spending hours finding them. We'll give you the whole list in 30 seconds.</p>
+    <div class="hero-ctas reveal">
+      <a href="#pricing" class="btn btn-lg btn-shadow">Find Leads Now →</a>
+      <a href="#manifesto" class="btn btn-outline btn-lg">Read the Manifesto</a>
+    </div>
+    <p class="footnote reveal">Free forever for the first 100 freelancers. No card.</p>
+  </div>
+</header>
+
+<!-- MARQUEE -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <span>NO COLD LISTS</span><span class="sep">●</span><span>NO SPAM</span><span class="sep">●</span><span>NO GUESSWORK</span><span class="sep">●</span><span>JUST THE BUSINESSES IN YOUR CITY THAT NEED YOU</span><span class="sep">●</span>
+    <span>NO COLD LISTS</span><span class="sep">●</span><span>NO SPAM</span><span class="sep">●</span><span>NO GUESSWORK</span><span class="sep">●</span><span>JUST THE BUSINESSES IN YOUR CITY THAT NEED YOU</span><span class="sep">●</span>
+  </div>
+</div>
+
+<!-- MANIFESTO -->
+<section class="manifesto pad divider" id="manifesto">
+  <div class="wrap">
+    <div class="sec-label reveal">Manifesto</div>
+    <h2 class="reveal">We're not building another <span class="serif">lead-gen</span> tool. We're building the one freelancers actually want.</h2>
+    <div class="two-col">
+      <div class="reveal">
+        <p>Cold outreach is broken. Buying lists is broken. And waiting for someone to publicly post <em>"I need a website"</em> is a small pond — and everyone's already fishing in it.</p>
+        <p>There's a better way: find the businesses that <em>should</em> hire you but don't even know they have a problem yet. The plumber whose site 404s. The dentist with no mobile layout. The restaurant invisible on Google. Be the first one to tell them.</p>
+        <div class="pullquote">Freelancers deserve tools that make them feel powerful, not tools that nickel-and-dime them.</div>
+      </div>
+      <div class="reveal">
+        <p>We built LocalLead because the existing tools are either enterprise platforms priced for VC-backed sales teams, or scraped junk lists with a 2% hit rate. Neither was made for the person doing the work alone.</p>
+        <p>You shouldn't need a sales ops team to find clients in your own city. You need real signals — broken sites, missing SSL, dead reviews — sorted by who needs you most.</p>
+        <p>If you've ever spent a Saturday afternoon manually checking websites one by one, this is for you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="pad divider" id="how">
+  <div class="wrap">
+    <div class="sec-label reveal">How it works</div>
+    <div class="grid-3 reveal">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <h3>Pick a city</h3>
+        <p>Enter a zip code or city + a business category. Plumbers in Orlando. Dentists in Boise. Restaurants in Bushwick.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <h3>We scan everything</h3>
+        <p>Every business, every site, every audit point. Mobile, speed, SSL, schema, reviews, Google Business Profile. All checked.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <h3>You pitch smart</h3>
+        <p>Each lead gets an opportunity score. Hot leads first. Owner contact included. Generate a branded audit PDF in one click.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DEMO -->
+<section class="pad divider" id="demo">
+  <div class="wrap">
+    <div class="demo-grid">
+      <div class="demo-left reveal">
+        <div class="sec-label">Live preview</div>
+        <h2>See what <span class="serif">one search</span> looks like.</h2>
+        <p>One city. One category. Every business that needs you, scored and sorted. This is real output from a single search.</p>
+      </div>
+      <div class="demo-card reveal">
+        <div class="demo-head"><span class="live-dot"></span> LIVE — PLUMBERS / ORLANDO, FL — 47 RESULTS</div>
+        <div class="lead-row">
+          <div class="lead-info">
+            <div class="lead-name">Joe's Plumbing</div>
+            <div class="lead-meta">1247 Orange Ave, Orlando · (407) 555-0148</div>
+            <div class="chips"><span class="chip red">No Website</span><span class="chip plain">47 Reviews</span><span class="chip black">Active</span></div>
+          </div>
+          <div class="lead-score score-red">96</div>
+        </div>
+        <div class="lead-row">
+          <div class="lead-info">
+            <div class="lead-name">Pipe Pros LLC</div>
+            <div class="lead-meta">Site returns 404 since Mar 2026 · (407) 555-0193</div>
+            <div class="chips"><span class="chip red">Broken</span><span class="chip black">No SSL</span></div>
+          </div>
+          <div class="lead-score score-red">89</div>
+        </div>
+        <div class="lead-row">
+          <div class="lead-info">
+            <div class="lead-name">AAA Drain</div>
+            <div class="lead-meta">Old WordPress, no mobile · (407) 555-0212</div>
+            <div class="chips"><span class="chip black">No Mobile</span><span class="chip yellow">Slow</span><span class="chip plain">No Schema</span></div>
+          </div>
+          <div class="lead-score score-orange">74</div>
+        </div>
+        <div class="lead-row">
+          <div class="lead-info">
+            <div class="lead-name">Sunshine Rooter</div>
+            <div class="lead-meta">No HTTPS, fails PageSpeed · (407) 555-0277</div>
+            <div class="chips"><span class="chip black">No SSL</span><span class="chip yellow">Fails PageSpeed</span><span class="chip yellow">Old Site</span></div>
+          </div>
+          <div class="lead-score score-orange">71</div>
+        </div>
+        <div class="lead-row">
+          <div class="lead-info">
+            <div class="lead-name">Orlando Plumbing Co</div>
+            <div class="lead-meta">Decent site, weak SEO · (407) 555-0301</div>
+            <div class="chips"><span class="chip plain">No Schema</span><span class="chip plain">Few Reviews</span></div>
+          </div>
+          <div class="lead-score score-gray">58</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="pad divider" id="features">
+  <div class="wrap">
+    <div class="sec-label reveal">Features</div>
+    <div class="feat-grid reveal">
+      <div class="feat"><div class="feat-num">01</div><h3>Smart Lead Discovery</h3><p>Pull every business in any city via official local data. Filter by category, rating, review count, distance.</p></div>
+      <div class="feat"><div class="feat-num">02</div><h3>Auto Website Audits</h3><p>Every lead is checked for broken pages, expired SSL, missing mobile, slow load times, no schema. 12-point audit per business.</p></div>
+      <div class="feat"><div class="feat-num">03</div><h3>Opportunity Scoring</h3><p>Each lead gets a 0–100 score. Hot, warm, cold — sorted automatically so you pitch the best ones first.</p></div>
+      <div class="feat"><div class="feat-num">04</div><h3>One-Click Audit Reports</h3><p>Generate a branded PDF audit you can send to the prospect. Your logo. Their problems. Your solution.</p></div>
+      <div class="feat"><div class="feat-num">05</div><h3>Contact Finder</h3><p>Owner name, email, phone, social profiles — extracted automatically and verified.</p></div>
+      <div class="feat"><div class="feat-num">06</div><h3>Hyperlocal Focus</h3><p>City + zip code precision. Find businesses in a 5-mile radius. Build location pages for the cities you target.</p></div>
+      <div class="feat"><div class="feat-num">07</div><h3>CSV & CRM Export</h3><p>Push leads to HubSpot, Pipedrive, Google Sheets. Or just copy-paste them. We don't lock your data.</p></div>
+      <div class="feat"><div class="feat-num">08</div><h3>Personal Lead Pipeline</h3><p>Mark leads as Contacted, Replied, Meeting Booked, Closed. Add notes. Your own mini-CRM built in.</p></div>
+      <div class="feat"><div class="feat-num">09</div><h3>New Lead Alerts</h3><p>Get notified when a new business appears in your city, or when a competitor's site goes down. Strike while it's hot.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- VS -->
+<section class="vs pad divider" id="vs">
+  <div class="wrap">
+    <div class="sec-label reveal">vs Buddy</div>
+    <h2 class="reveal">We're not Buddy. <span class="serif">We're built for a different freelancer.</span></h2>
+    <div class="reveal">
+      <table class="cmp">
+        <thead>
+          <tr><th></th><th class="col-buddy">Buddy</th><th class="col-ll">LocalLead</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>How it finds leads</td><td data-col="Buddy">Listens to public posts</td><td data-col="LocalLead">Scans local business data</td></tr>
+          <tr><td>Best for</td><td data-col="Buddy">Any business, globally</td><td data-col="LocalLead">Local service freelancers</td></tr>
+          <tr><td>Lead supply</td><td data-col="Buddy">Limited to who posts publicly</td><td data-col="LocalLead">Every business in your city</td></tr>
+          <tr><td>Geographic targeting</td><td data-col="Buddy">None</td><td data-col="LocalLead">City + zip precision</td></tr>
+          <tr><td>Website audit included</td><td data-col="Buddy"><span class="no">✘ No</span></td><td data-col="LocalLead"><span class="yes">✔ Full 12-point audit</span></td></tr>
+          <tr><td>Pre-qualified by data</td><td data-col="Buddy"><span class="no">✘ Keywords only</span></td><td data-col="LocalLead"><span class="yes">✔ Real signals</span></td></tr>
+          <tr><td>Competition for each lead</td><td data-col="Buddy">High (everyone sees same post)</td><td data-col="LocalLead">Low (you found them first)</td></tr>
+          <tr><td>Starting price</td><td data-col="Buddy">$149/month</td><td data-col="LocalLead">$29/month</td></tr>
+          <tr><td>Best when you want</td><td data-col="Buddy">"Send me hand-raisers"</td><td data-col="LocalLead">"Help me dominate my city"</td></tr>
+        </tbody>
+      </table>
+      <p class="vs-note">Both tools are valid. We just believe local freelancers deserve a tool built for them, not a generic enterprise lead-gen platform.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DARK AUDIT -->
+<section class="dark pad" id="audit">
+  <div class="wrap">
+    <div class="sec-label reveal">The full audit</div>
+    <h2 class="reveal">What we check on <span class="serif">every single</span> lead.</h2>
+    <div class="audit-grid reveal">
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>Broken Site</h3><p>4xx/5xx errors, DNS failures, parked domains.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>No SSL</h3><p>Missing or expired HTTPS certificate.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>Not Mobile Friendly</h3><p>Fails Google's mobile usability test.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>Slow Load Time</h3><p>Core Web Vitals: LCP, FID, CLS scored.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>No Schema Markup</h3><p>Missing LocalBusiness JSON-LD.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>Weak Meta Tags</h3><p>No title, no description, or duplicated.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>No Google Maps Embed</h3><p>Local trust signal missing.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>No Click-to-Call</h3><p>Mobile users can't tap to call.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>Low Review Count</h3><p>Under 10 Google reviews.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>Stale Reviews</h3><p>No new reviews in 6+ months.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>Incomplete GMB</h3><p>No hours, photos, or description.</p></div></div>
+      <div class="audit-item"><span class="audit-ico">●</span><div><h3>NAP Inconsistency</h3><p>Name/address/phone differs across directories.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pad divider" id="pricing">
+  <div class="wrap">
+    <div class="sec-label reveal">Pricing</div>
+    <div class="price-grid reveal">
+      <div class="plan">
+        <div class="plan-name">Starter</div>
+        <div class="plan-price">Free</div>
+        <div class="plan-bill">Free forever</div>
+        <ul>
+          <li>10 searches / month</li>
+          <li>Basic audit</li>
+          <li>CSV export</li>
+          <li>Community access</li>
+        </ul>
+        <a href="#" class="btn btn-outline">Start Free</a>
+      </div>
+      <div class="plan featured">
+        <span class="popular-tag">Most Popular</span>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$29<small>/mo</small></div>
+        <div class="plan-bill">Billed monthly</div>
+        <ul>
+          <li>Unlimited searches</li>
+          <li>Full 12-point audit</li>
+          <li>PDF reports</li>
+          <li>Contact finder</li>
+          <li>Lead pipeline</li>
+          <li>New lead alerts</li>
+        </ul>
+        <a href="#" class="btn">Start Free Trial</a>
+      </div>
+      <div class="plan">
+        <div class="plan-name">Agency</div>
+        <div class="plan-price">$79<small>/mo</small></div>
+        <div class="plan-bill">Billed monthly</div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>White-label reports</li>
+          <li>3 team seats</li>
+          <li>API access</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="#" class="btn btn-outline">Start Free Trial</a>
+      </div>
+    </div>
+    <p class="price-note reveal">No credit card to start. Cancel any time. Built for solo freelancers, priced like it.</p>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq pad divider" id="faq">
+  <div class="wrap">
+    <div class="sec-label reveal">FAQ</div>
+    <h2 class="reveal">Questions, <span class="serif">answered.</span></h2>
+    <div class="reveal">
+      <details><summary>Where does your data come from? <span class="faq-plus">+</span></summary><div class="faq-body">We pull from official local business data sources and public web crawls — the same kind of APIs that power maps and directory listings. No scraped junk lists, no shady backchannels.</div></details>
+      <details><summary>Is this legal? <span class="faq-plus">+</span></summary><div class="faq-body">Yes. We only use official APIs and publicly available information — business names, addresses, phone numbers, and the state of their public website. Nothing you couldn't look up yourself, just done 1,000x faster.</div></details>
+      <details><summary>How accurate is the audit data? <span class="faq-plus">+</span></summary><div class="faq-body">Every audit point is checked live at search time — SSL, mobile, PageSpeed, schema, reviews. If a site went down yesterday, we'll know today. We re-verify before you pitch.</div></details>
+      <details><summary>Can I cancel any time? <span class="faq-plus">+</span></summary><div class="faq-body">Yes. One click, no phone call, no retention gauntlet. Cancel and you keep access until the end of your billing period.</div></details>
+      <details><summary>What if my city isn't supported? <span class="faq-plus">+</span></summary><div class="faq-body">We cover the US, Canada, UK, and Australia at launch, with new regions added monthly. Don't see yours? Tell us — we prioritize by demand.</div></details>
+      <details><summary>Is there a free trial? <span class="faq-plus">+</span></summary><div class="faq-body">The Starter plan is free forever — 10 searches a month, no card. Pro and Agency come with a free trial so you can run real searches before paying.</div></details>
+      <details><summary>Do you offer team plans? <span class="faq-plus">+</span></summary><div class="faq-body">Yes. The Agency plan includes 3 team seats, white-label reports, and API access. Need more seats? Reach out and we'll sort it.</div></details>
+      <details><summary>How is this different from Buddy or Apollo? <span class="faq-plus">+</span></summary><div class="faq-body">Buddy and Apollo wait for buying signals or sell you generic B2B contact lists. We find businesses that already need help — broken sites, weak SEO — in your specific city, before anyone else does.</div></details>
+      <details><summary>Will you raise prices later? <span class="faq-plus">+</span></summary><div class="faq-body">If you join early, your price is locked for life. We may add higher tiers, but we won't move you off the plan you signed up for. That's a promise.</div></details>
+      <details><summary>Can I get a refund? <span class="faq-plus">+</span></summary><div class="faq-body">If LocalLead isn't pulling its weight in your first 14 days on a paid plan, email us and we'll refund you. No forms, no interrogation.</div></details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final">
+  <div class="wrap">
+    <h2 class="reveal">Your <span class="serif">next 50 clients</span> are in your city right now.</h2>
+    <p class="reveal">Stop wasting Saturdays on Google Maps. Find them in 30 seconds.</p>
+    <a href="#pricing" class="btn btn-cream reveal">FIND THEM NOW →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-logo">LOCALLEAD<span class="dot">.</span></div>
+        <p class="foot-tag">Made for freelancers who'd rather find clients than chase them.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#manifesto">Manifesto</a>
+        <a href="#">Roadmap</a>
+      </div>
+      <div class="foot-col">
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Contact</a>
+        <a href="#">Support</a>
+      </div>
+      <div class="foot-col">
+        <h4>Legal</h4>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Refund</a>
+      </div>
+    </div>
+    <div class="foot-bottom">© 2026 LocalLead. Built by one person who got tired of the grind.</div>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+
+  // Mobile nav toggle
+  const toggle = document.getElementById('navToggle');
+  const links = document.querySelector('.nav-links');
+  toggle.addEventListener('click', () => {
+    const open = links.style.display === 'flex';
+    if (open) {
+      links.style.display = '';
+    } else {
+      links.style.display = 'flex';
+      links.style.position = 'absolute';
+      links.style.top = '64px';
+      links.style.left = '0';
+      links.style.right = '0';
+      links.style.flexDirection = 'column';
+      links.style.background = 'var(--cream)';
+      links.style.borderBottom = '1.5px solid var(--ink)';
+      links.style.padding = '18px 28px';
+      links.style.gap = '14px';
+      links.querySelectorAll('a:not(.btn)').forEach(a => a.style.display = 'block');
+    }
+  });
+  // Close mobile menu on link click
+  links.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    if (window.innerWidth <= 968) { links.style.display = ''; links.querySelectorAll('a:not(.btn)').forEach(x => x.style.display = ''); }
+  }));
+</script>
+</body>
+</html>
