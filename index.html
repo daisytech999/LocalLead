@@ -313,20 +313,6 @@
   .feat h3 { font-size: 22px; margin-bottom: 12px; }
   .feat p { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 18px; line-height: 1.4; }
 
-  /* ---------- VS ---------- */
-  .vs h2 { font-size: clamp(32px, 5vw, 66px); max-width: 920px; margin-bottom: 46px; }
-  .vs h2 .serif { color: var(--red); text-transform: none; }
-  .cmp { width: 100%; border-collapse: collapse; border: var(--border); }
-  .cmp th, .cmp td { border: var(--border); padding: 16px 18px; text-align: left; vertical-align: top; font-size: 14px; }
-  .cmp thead th { font-family: 'Anton', sans-serif; text-transform: uppercase; font-size: 19px; letter-spacing: 0.03em; }
-  .cmp thead th:nth-child(1) { background: var(--cream); width: 30%; }
-  .cmp thead th.col-buddy { background: var(--ink); color: var(--cream); }
-  .cmp thead th.col-ll { background: var(--red); color: #fff; }
-  .cmp tbody td:first-child { font-weight: 700; text-transform: uppercase; font-size: 12px; letter-spacing: 0.04em; }
-  .cmp .yes { color: var(--green); font-weight: 800; }
-  .cmp .no { color: var(--red); font-weight: 800; }
-  .vs-note { margin-top: 24px; font-family: 'Instrument Serif', serif; font-style: italic; font-size: 19px; max-width: 740px; }
-
   /* ---------- DARK AUDIT ---------- */
   .dark { background: var(--ink); color: var(--cream); border-top: var(--border); border-bottom: var(--border); }
   .dark .sec-label::before { background: var(--yellow); }
@@ -472,12 +458,6 @@
     .audit-grid { grid-template-columns: 1fr; }
     .audit-item { border-right: none; }
     .audit-item:nth-last-child(2) { border-bottom: 1.5px solid #333; }
-    .cmp, .cmp thead, .cmp tbody, .cmp th, .cmp td, .cmp tr { display: block; }
-    .cmp thead { display: none; }
-    .cmp tbody td { border: none; border-bottom: 1.5px dotted rgba(0,0,0,0.25); }
-    .cmp tbody tr { border: var(--border); margin-bottom: -1.5px; padding: 6px 0; }
-    .cmp tbody td:first-child { background: var(--cream); font-size: 13px; }
-    .cmp tbody td[data-col]::before { content: attr(data-col) ": "; font-weight: 700; text-transform: uppercase; font-size: 11px; }
   }
   @media (max-width: 600px) {
     .wrap { padding: 0 18px; }
@@ -576,7 +556,6 @@
       <a href="#manifesto">Manifesto</a>
       <a href="#how">How</a>
       <a href="#features">Features</a>
-      <a href="#vs">vs Buddy</a>
       <a href="#pricing">Pricing</a>
       <a href="#faq">FAQ</a>
       <a href="#" class="btn" data-action="auth">Try Free</a>
@@ -721,33 +700,6 @@
       <div class="feat"><div class="feat-num">07</div><h3>CSV & CRM Export</h3><p>Push leads to HubSpot, Pipedrive, Google Sheets. Or just copy-paste them. We don't lock your data.</p></div>
       <div class="feat"><div class="feat-num">08</div><h3>Personal Lead Pipeline</h3><p>Mark leads as Contacted, Replied, Meeting Booked, Closed. Add notes. Your own mini-CRM built in.</p></div>
       <div class="feat"><div class="feat-num">09</div><h3>New Lead Alerts</h3><p>Get notified when a new business appears in your city, or when a competitor's site goes down. Strike while it's hot.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- VS -->
-<section class="vs pad divider" id="vs">
-  <div class="wrap">
-    <div class="sec-label reveal">vs Buddy</div>
-    <h2 class="reveal">We're not Buddy. <span class="serif">We're built for a different freelancer.</span></h2>
-    <div class="reveal">
-      <table class="cmp">
-        <thead>
-          <tr><th></th><th class="col-buddy">Buddy</th><th class="col-ll">LocalLead</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>How it finds leads</td><td data-col="Buddy">Listens to public posts</td><td data-col="LocalLead">Scans local business data</td></tr>
-          <tr><td>Best for</td><td data-col="Buddy">Any business, globally</td><td data-col="LocalLead">Local service freelancers</td></tr>
-          <tr><td>Lead supply</td><td data-col="Buddy">Limited to who posts publicly</td><td data-col="LocalLead">Every business in your city</td></tr>
-          <tr><td>Geographic targeting</td><td data-col="Buddy">None</td><td data-col="LocalLead">City + zip precision</td></tr>
-          <tr><td>Website audit included</td><td data-col="Buddy"><span class="no">✘ No</span></td><td data-col="LocalLead"><span class="yes">✔ Full 12-point audit</span></td></tr>
-          <tr><td>Pre-qualified by data</td><td data-col="Buddy"><span class="no">✘ Keywords only</span></td><td data-col="LocalLead"><span class="yes">✔ Real signals</span></td></tr>
-          <tr><td>Competition for each lead</td><td data-col="Buddy">High (everyone sees same post)</td><td data-col="LocalLead">Low (you found them first)</td></tr>
-          <tr><td>Starting price</td><td data-col="Buddy">$149/month</td><td data-col="LocalLead">$29/month</td></tr>
-          <tr><td>Best when you want</td><td data-col="Buddy">"Send me hand-raisers"</td><td data-col="LocalLead">"Help me dominate my city"</td></tr>
-        </tbody>
-      </table>
-      <p class="vs-note">Both tools are valid. We just believe local freelancers deserve a tool built for them, not a generic enterprise lead-gen platform.</p>
     </div>
   </div>
 </section>
