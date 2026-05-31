@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5" />
+<title>Love Language — Find the perfect way to love her</title>
+<meta name="description" content="A quiz that tells your boyfriend exactly how you want to be loved — and what to get you." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --rose: #FF85A1;
+    --rose-deep: #ff5e85;
+    --purple: #7C3AED;
+    --purple-deep: #5b21b6;
+    --cream: #FFF8F0;
+    --gold: #F59E0B;
+    --white: #FFFFFF;
+    --ink: #2a1830;
+    --muted: #6b5b73;
+    --line: rgba(124, 58, 237, 0.12);
+    --shadow-sm: 0 4px 14px rgba(124, 58, 237, 0.08);
+    --shadow-md: 0 12px 36px rgba(124, 58, 237, 0.14);
+    --shadow-lg: 0 24px 64px rgba(124, 58, 237, 0.18);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, .serif {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  /* ============ THREE.JS BACKDROP ============ */
+  #bg-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  main {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ============ HERO ============ */
+  .hero {
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(255, 248, 240, 0.55) 0%, rgba(255, 248, 240, 0.85) 60%, rgba(255, 248, 240, 0.95) 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .hero-inner {
+    max-width: 720px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+
+  .eyebrow {
+    display: inline-block;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--purple);
+    background: rgba(255, 133, 161, 0.12);
+    padding: 8px 16px;
+    border-radius: 999px;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-size: clamp(38px, 7vw, 68px);
+    margin-bottom: 18px;
+    background: linear-gradient(135deg, var(--ink) 0%, var(--purple-deep) 60%, var(--rose-deep) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .hero p.sub {
+    font-size: clamp(16px, 2vw, 19px);
+    color: var(--muted);
+    max-width: 520px;
+    margin: 0 auto 36px;
+  }
+
+  .cta-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    padding: 16px 28px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--rose) 0%, var(--purple) 100%);
+    color: white;
+    box-shadow: 0 10px 24px rgba(255, 94, 133, 0.32);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(255, 94, 133, 0.42);
+  }
+
+  .btn-secondary {
+    background: white;
+    color: var(--purple-deep);
+    border: 1.5px solid var(--line);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-secondary:hover {
+    transform: translateY(-2px);
+    border-color: var(--purple);
+  }
+
+  /* ============ SECTIONS ============ */
+  section {
+    padding: 100px 20px;
+    position: relative;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-head {
+    text-align: center;
+    max-width: 620px;
+    margin: 0 auto 56px;
+  }
+
+  .section-head h2 {
+    font-size: clamp(32px, 5vw, 48px);
+    margin-bottom: 14px;
+    color: var(--ink);
+  }
+
+  .section-head p {
+    color: var(--muted);
+    font-size: 17px;
+  }
+
+  /* ============ QUIZ ============ */
+  .quiz-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: rgba(124, 58, 237, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-bottom: 14px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 20%;
+    background: linear-gradient(90deg, var(--rose), var(--purple));
+    border-radius: 999px;
+    transition: width 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .progress-label {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 30px;
+    letter-spacing: 0.04em;
+  }
+
+  .quiz-stage {
+    perspective: 1500px;
+    min-height: 480px;
+    position: relative;
+  }
+
+  .quiz-card {
+    background: white;
+    border-radius: 28px;
+    padding: 40px 32px;
+    box-shadow: var(--shadow-lg);
+    transform-style: preserve-3d;
+    transition: transform 0.7s cubic-bezier(0.65, 0, 0.35, 1), opacity 0.4s ease;
+    backface-visibility: hidden;
+  }
+
+  .quiz-card.flipping {
+    transform: rotateY(90deg);
+    opacity: 0;
+  }
+
+  .question-num {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--rose-deep);
+    margin-bottom: 14px;
+  }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 3.4vw, 28px);
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 26px;
+    line-height: 1.3;
+  }
+
+  .answers {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .answer {
+    background: var(--cream);
+    border: 1.5px solid transparent;
+    border-radius: 16px;
+    padding: 16px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    font-size: 15px;
+    text-align: left;
+    color: var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    line-height: 1.4;
+  }
+
+  .answer:hover {
+    border-color: var(--rose);
+    background: white;
+    transform: translateX(4px);
+  }
+
+  .answer.selected {
+    background: linear-gradient(135deg, rgba(255, 133, 161, 0.16), rgba(124, 58, 237, 0.08));
+    border-color: var(--rose);
+    color: var(--ink);
+  }
+
+  .answer-letter {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: white;
+    border: 1.5px solid var(--line);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--purple-deep);
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+
+  .answer.selected .answer-letter {
+    background: linear-gradient(135deg, var(--rose), var(--purple));
+    color: white;
+    border-color: transparent;
+  }
+
+  /* ============ RESULTS ============ */
+  .result-card {
+    background: white;
+    border-radius: 32px;
+    padding: 50px 36px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .result-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: linear-gradient(90deg, var(--rose), var(--purple), var(--gold));
+  }
+
+  .result-icon {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 24px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(255, 133, 161, 0.15), rgba(124, 58, 237, 0.12));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .result-icon svg {
+    width: 44px;
+    height: 44px;
+    color: var(--rose-deep);
+  }
+
+  .result-eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .result-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(30px, 5vw, 44px);
+    font-weight: 700;
+    margin-bottom: 18px;
+    background: linear-gradient(135deg, var(--purple-deep), var(--rose-deep));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .result-desc {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 480px;
+    margin: 0 auto 32px;
+    line-height: 1.7;
+  }
+
+  .tie-choices {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .tie-choice {
+    background: var(--cream);
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--ink);
+    transition: all 0.2s ease;
+  }
+
+  .tie-choice:hover, .tie-choice.active {
+    border-color: var(--rose);
+    background: white;
+  }
+
+  /* ============ GIFT FINDER ============ */
+  .filters {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 40px;
+  }
+
+  .filter-row {
+    margin-bottom: 16px;
+  }
+
+  .filter-row:last-child { margin-bottom: 0; }
+
+  .filter-label {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  .filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    background: var(--cream);
+    border: 1.5px solid transparent;
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--ink);
+    transition: all 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .pill:hover {
+    border-color: var(--rose);
+  }
+
+  .pill.active {
+    background: linear-gradient(135deg, var(--rose), var(--purple));
+    color: white;
+    border-color: transparent;
+  }
+
+  .pill.lang-pill.active {
+    background: linear-gradient(135deg, var(--purple), var(--purple-deep));
+  }
+
+  .results-count {
+    text-align: center;
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .gift-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  @media (min-width: 768px) {
+    .gift-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .gift-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .gift-card {
+    background: white;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transform-style: preserve-3d;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .gift-card:hover {
+    box-shadow: var(--shadow-md);
+  }
+
+  .gift-image {
+    height: 150px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .gift-image svg {
+    width: 56px;
+    height: 56px;
+    color: white;
+    opacity: 0.92;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+  }
+
+  .gift-body {
+    padding: 20px 20px 22px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .gift-tags {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+
+  .gift-tag {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(124, 58, 237, 0.08);
+    color: var(--purple-deep);
+  }
+
+  .gift-tag.price {
+    background: rgba(245, 158, 11, 0.14);
+    color: #b4730a;
+  }
+
+  .gift-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 19px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+
+  .gift-desc {
+    color: var(--muted);
+    font-size: 14px;
+    margin-bottom: 18px;
+    flex: 1;
+  }
+
+  .gift-buttons {
+    display: flex;
+    gap: 8px;
+  }
+
+  .gift-btn {
+    flex: 1;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: 1.5px solid var(--line);
+    background: white;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  .gift-btn:hover {
+    border-color: var(--rose);
+    color: var(--rose-deep);
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    background: white;
+    border-radius: 22px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* ============ SHARE ============ */
+  .share-card {
+    max-width: 640px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, #fff4f7 0%, #f5edff 100%);
+    border-radius: 32px;
+    padding: 48px 32px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+  }
+
+  .share-card h3 {
+    font-size: clamp(26px, 4vw, 36px);
+    margin-bottom: 12px;
+    color: var(--ink);
+  }
+
+  .share-card p {
+    color: var(--muted);
+    margin-bottom: 28px;
+    font-size: 16px;
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-whatsapp {
+    background: #25D366;
+    color: white;
+    box-shadow: 0 10px 24px rgba(37, 211, 102, 0.32);
+  }
+
+  .btn-whatsapp:hover {
+    transform: translateY(-2px);
+    background: #1fb957;
+  }
+
+  /* ============ INCOMING BANNER ============ */
+  .incoming-banner {
+    max-width: 720px;
+    margin: 0 auto 40px;
+    background: linear-gradient(135deg, var(--rose) 0%, var(--purple) 100%);
+    color: white;
+    border-radius: 24px;
+    padding: 28px 26px;
+    text-align: center;
+    box-shadow: var(--shadow-md);
+    display: none;
+  }
+
+  .incoming-banner.show {
+    display: block;
+  }
+
+  .incoming-banner .banner-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-bottom: 8px;
+  }
+
+  .incoming-banner h3 {
+    font-size: clamp(22px, 3vw, 28px);
+    color: white;
+    margin-bottom: 6px;
+  }
+
+  .incoming-banner p {
+    opacity: 0.92;
+    font-size: 15px;
+  }
+
+  /* ============ FOOTER ============ */
+  footer {
+    text-align: center;
+    padding: 60px 20px 40px;
+    color: var(--muted);
+    font-size: 13px;
+    position: relative;
+    z-index: 2;
+  }
+
+  footer .heart {
+    color: var(--rose-deep);
+  }
+
+  /* ============ UTIL ============ */
+  .hidden { display: none !important; }
+
+  .fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  @media (max-width: 480px) {
+    section { padding: 70px 16px; }
+    .quiz-card { padding: 30px 22px; }
+    .result-card { padding: 40px 22px; }
+    .share-card { padding: 36px 22px; }
+    .filters { padding: 18px; }
+    .cta-row { flex-direction: column; align-items: stretch; }
+    .btn { justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<main>
+
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">For the guy who wants to get it right</span>
+      <h1>Find the perfect way to love her</h1>
+      <p class="sub">A quiz that tells your boyfriend exactly what you need — and what to get you.</p>
+      <div class="cta-row">
+        <button class="btn btn-primary" onclick="scrollToSection('quiz')">She takes the quiz</button>
+        <button class="btn btn-secondary" onclick="scrollToSection('gifts')">He finds a gift</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ QUIZ ============ -->
+  <section id="quiz">
+    <div class="container">
+      <div class="section-head">
+        <h2>The love language quiz</h2>
+        <p>Five questions. About a minute. Pretty accurate.</p>
+      </div>
+
+      <div class="quiz-wrap" id="quizWrap">
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="progress-label" id="progressLabel">Question 1 of 5</div>
+
+        <div class="quiz-stage">
+          <div class="quiz-card" id="quizCard">
+            <div class="question-num" id="questionNum">Question 01</div>
+            <div class="question-text" id="questionText"></div>
+            <div class="answers" id="answers"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="quiz-wrap hidden" id="resultsWrap">
+        <div class="result-card">
+          <div class="result-icon" id="resultIcon"></div>
+          <div class="result-eyebrow">Her love language is</div>
+          <h3 class="result-name" id="resultName"></h3>
+          <div id="tieWrap" class="tie-choices hidden"></div>
+          <p class="result-desc" id="resultDesc"></p>
+          <button class="btn btn-primary" onclick="goToGifts()">See your gifts</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ GIFTS ============ -->
+  <section id="gifts" style="background: linear-gradient(180deg, transparent 0%, rgba(255, 244, 247, 0.4) 100%);">
+    <div class="container">
+      <div class="incoming-banner" id="incomingBanner">
+        <div class="banner-eyebrow">A gentle nudge</div>
+        <h3>She already took the quiz</h3>
+        <p>Here's exactly how she feels most loved.</p>
+      </div>
+
+      <div class="section-head">
+        <h2>The gift finder</h2>
+        <p>Filter by budget, occasion, and her love language. Real gifts, no fluff.</p>
+      </div>
+
+      <div class="filters">
+        <div class="filter-row">
+          <div class="filter-label">Budget</div>
+          <div class="filter-pills" id="budgetPills"></div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-label">Occasion</div>
+          <div class="filter-pills" id="occasionPills"></div>
+        </div>
+        <div class="filter-row">
+          <div class="filter-label">Love language</div>
+          <div class="filter-pills" id="languagePills"></div>
+        </div>
+      </div>
+
+      <div class="results-count" id="resultsCount"></div>
+      <div class="gift-grid" id="giftGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ SHARE ============ -->
+  <section id="share">
+    <div class="container">
+      <div class="share-card">
+        <h3>Send this to him</h3>
+        <p>Share your love language result so he knows exactly what you want.</p>
+        <div class="share-buttons">
+          <button class="btn btn-primary" id="copyBtn" onclick="copyShareLink()">Copy my results link</button>
+          <button class="btn btn-whatsapp" onclick="shareWhatsApp()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163a11.867 11.867 0 01-1.587-5.946C.16 5.335 5.495 0 12.05 0a11.817 11.817 0 018.413 3.488 11.824 11.824 0 013.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 01-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+            Share on WhatsApp
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Built with <span class="heart">&hearts;</span> for couples who want to get it right.
+  </footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+<script>
+/* =================================================================
+   QUIZ DATA
+   ================================================================= */
+const questions = [
+  {
+    q: "When she's had a hard day, what does she want most?",
+    a: [
+      { l: "A", t: "To hear that everything will be okay" },
+      { l: "B", t: "A long hug or cuddle" },
+      { l: "C", t: "For you to handle something for her" },
+      { l: "D", t: "To spend quality time with you" },
+      { l: "E", t: "A thoughtful little gift" }
+    ]
+  },
+  {
+    q: "Which compliment means the most to her?",
+    a: [
+      { l: "A", t: "\"You're so smart and capable\"" },
+      { l: "B", t: "\"I love being close to you\"" },
+      { l: "C", t: "\"You never have to worry, I've got you\"" },
+      { l: "D", t: "\"My favourite moments are just us two\"" },
+      { l: "E", t: "\"I saw this and immediately thought of you\"" }
+    ]
+  },
+  {
+    q: "What's her ideal Sunday?",
+    a: [
+      { l: "A", t: "Long conversations about life and dreams" },
+      { l: "B", t: "Staying in bed together all morning" },
+      { l: "C", t: "You surprising her with breakfast made" },
+      { l: "D", t: "A full day with no distractions, just you two" },
+      { l: "E", t: "A cute outing with something to bring home" }
+    ]
+  },
+  {
+    q: "How does she usually show love?",
+    a: [
+      { l: "A", t: "Tells you exactly how she feels" },
+      { l: "B", t: "Always close to you, touches your arm" },
+      { l: "C", t: "Does small things to make your life easier" },
+      { l: "D", t: "Plans time together, hates when plans change" },
+      { l: "E", t: "Brings you things, finds things you'd like" }
+    ]
+  },
+  {
+    q: "What upsets her most?",
+    a: [
+      { l: "A", t: "Feeling unappreciated or unacknowledged" },
+      { l: "B", t: "Distance or coldness from you" },
+      { l: "C", t: "You forgetting something important she mentioned" },
+      { l: "D", t: "You choosing other things over time with her" },
+      { l: "E", t: "Forgotten occasions or thoughtless gifts" }
+    ]
+  }
+];
+
+const languages = {
+  words: {
+    name: "Words of Affirmation",
+    code: "words",
+    desc: "She feels most loved when she hears it. Telling her she's appreciated, leaving her a note, or saying exactly what you love about her means more to her than almost anything physical. The right words at the right moment change her whole day.",
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>',
+    gradient: "linear-gradient(135deg, #FF85A1 0%, #ff5e85 100%)"
+  },
+  touch: {
+    name: "Physical Touch",
+    code: "touch",
+    desc: "Being close to you is how she feels safe and loved. A hand on her back, staying close on the sofa, or a long hug when she needs it — these small moments of closeness are her love language. She doesn't need grand gestures, just your presence.",
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>',
+    gradient: "linear-gradient(135deg, #7C3AED 0%, #5b21b6 100%)"
+  },
+  service: {
+    name: "Acts of Service",
+    code: "service",
+    desc: "Actions speak louder than words for her. When you handle something she was dreading, cook dinner without being asked, or remember a small thing she mentioned — that's when she feels truly cared for. Effort is love in her world.",
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+    gradient: "linear-gradient(135deg, #F59E0B 0%, #d97706 100%)"
+  },
+  time: {
+    name: "Quality Time",
+    code: "time",
+    desc: "Undivided attention is everything to her. Not just being in the same room — but being present, putting the phone down, and choosing her. She remembers the time you gave her, not the things you gave her.",
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
+    gradient: "linear-gradient(135deg, #7C3AED 0%, #FF85A1 100%)"
+  },
+  gifts: {
+    name: "Receiving Gifts",
+    code: "gifts",
+    desc: "It's not about expense — it's about being thought of. When you see something and think of her, or remember what she mentioned months ago, that moment of being known and remembered is what she treasures. The thoughtfulness is the gift.",
+    icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/></svg>',
+    gradient: "linear-gradient(135deg, #F59E0B 0%, #FF85A1 100%)"
+  }
+};
+
+const letterToLang = { A: "words", B: "touch", C: "service", D: "time", E: "gifts" };
+
+/* =================================================================
+   GIFT DATA
+   ================================================================= */
+const gifts = [
+  // WORDS OF AFFIRMATION
+  { name: "Custom love letter book", desc: "A printed book of personalised letters — one for each month of the year.", price: "$35–60", budget: ["$25–$50","$50–$100"], occasions: ["Anniversary","Birthday","Valentine's Day"], language: "words" },
+  { name: "Star map print", desc: "A framed print of the night sky on your first date or most meaningful night together.", price: "$25–45", budget: ["Under $25","$25–$50"], occasions: ["Anniversary","Birthday","Valentine's Day"], language: "words" },
+  { name: "Personalised poem, framed", desc: "A poem written specifically about her and your relationship, professionally printed.", price: "$30–55", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Anniversary","Just because"], language: "words" },
+  { name: "52 reasons I love you jar", desc: "52 handwritten notes, one for each week of the year.", price: "$15–25", budget: ["Under $25"], occasions: ["Just because","Valentine's Day","Apology"], language: "words" },
+  { name: "Engraved necklace with meaningful date", desc: "Her most important date engraved on a delicate necklace.", price: "$45–90", budget: ["$25–$50","$50–$100"], occasions: ["Anniversary","Birthday","Valentine's Day"], language: "words" },
+  { name: "Custom illustrated portrait", desc: "A digital artist draws her portrait in a style she loves.", price: "$50–100", budget: ["$50–$100"], occasions: ["Birthday","Anniversary"], language: "words" },
+
+  // PHYSICAL TOUCH
+  { name: "Weighted blanket", desc: "Heavy, warm, and comforting — feels like a constant gentle hug.", price: "$40–80", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Just because","Apology"], language: "touch" },
+  { name: "Couples massage booking", desc: "Side-by-side massage experience for both of you to enjoy together.", price: "$80–150", budget: ["$50–$100","$100–$200"], occasions: ["Anniversary","Valentine's Day","Birthday"], language: "touch" },
+  { name: "Cashmere sweater", desc: "Incredibly soft, the kind she'll reach for every single day in winter.", price: "$60–120", budget: ["$50–$100","$100–$200"], occasions: ["Birthday","Anniversary","Just because"], language: "touch" },
+  { name: "Luxury spa gift set", desc: "Bath oils, body scrub, and candles — a full evening of self-care.", price: "$35–65", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Just because","Apology"], language: "touch" },
+  { name: "Silk pillowcase set", desc: "Cool, smooth, gentle on skin and hair — she'll notice the difference immediately.", price: "$35–70", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Just because"], language: "touch" },
+  { name: "Matching couple pyjama set", desc: "Cosy matching sets, perfect for a lazy morning in bed together.", price: "$40–75", budget: ["$25–$50","$50–$100"], occasions: ["Valentine's Day","Anniversary","Just because"], language: "touch" },
+
+  // ACTS OF SERVICE
+  { name: "Meal kit subscription (1 month)", desc: "Takes the mental load of 'what's for dinner' completely off her plate.", price: "$60–90", budget: ["$50–$100"], occasions: ["Birthday","Just because","Apology"], language: "service" },
+  { name: "Robot vacuum cleaner", desc: "Handles her least favourite chore automatically, every single day.", price: "$150–300", budget: ["$100–$200","$200+"], occasions: ["Birthday","Anniversary"], language: "service" },
+  { name: "Coffee subscription (3 months)", desc: "Fresh premium coffee delivered to her door — she never runs out.", price: "$45–70", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Just because"], language: "service" },
+  { name: "Meal prep kit with cookbook", desc: "Everything she needs to cook smarter and save time during the week.", price: "$35–60", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Just because"], language: "service" },
+  { name: "Smart desk organiser set", desc: "Declutters her workspace so she can think more clearly every day.", price: "$40–80", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Just because"], language: "service" },
+  { name: "House cleaning session voucher", desc: "Book a professional cleaner — give her a full day of not thinking about it.", price: "$80–150", budget: ["$50–$100","$100–$200"], occasions: ["Birthday","Apology","Just because"], language: "service" },
+
+  // QUALITY TIME
+  { name: "Monthly date night experience box", desc: "A new curated date night delivered to your door each month.", price: "$50–100", budget: ["$50–$100"], occasions: ["Anniversary","Valentine's Day","Birthday"], language: "time" },
+  { name: "Cooking class for two", desc: "Learn to cook a new cuisine together — funny, memorable, and delicious.", price: "$80–150", budget: ["$50–$100","$100–$200"], occasions: ["Anniversary","Birthday","Valentine's Day"], language: "time" },
+  { name: "Polaroid camera", desc: "Capture your moments in real time — prints appear instantly.", price: "$60–90", budget: ["$50–$100"], occasions: ["Birthday","Anniversary","Just because"], language: "time" },
+  { name: "1000-piece couples puzzle", desc: "A beautiful illustration to work on together across a few evenings.", price: "$20–40", budget: ["Under $25","$25–$50"], occasions: ["Just because","Valentine's Day"], language: "time" },
+  { name: "3-year couples journal", desc: "One question per day, answered together — your relationship in a book.", price: "$25–45", budget: ["Under $25","$25–$50"], occasions: ["Anniversary","Valentine's Day","Just because"], language: "time" },
+  { name: "Stargazing night kit", desc: "Warm blanket, hot chocolate mix, and a star guide for a night under the sky.", price: "$30–60", budget: ["$25–$50","$50–$100"], occasions: ["Anniversary","Valentine's Day","Just because"], language: "time" },
+
+  // RECEIVING GIFTS
+  { name: "Personalised jewellery box", desc: "Her name or initials on a beautiful keepsake box for all her jewellery.", price: "$40–80", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Anniversary"], language: "gifts" },
+  { name: "Silk scarf", desc: "Timeless and versatile — a gift that feels luxurious every time she wears it.", price: "$35–70", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Anniversary","Valentine's Day"], language: "gifts" },
+  { name: "Perfume gift set", desc: "A collection of her favourite scent or a new one to discover.", price: "$60–120", budget: ["$50–$100","$100–$200"], occasions: ["Birthday","Valentine's Day","Anniversary"], language: "gifts" },
+  { name: "Custom pet illustration", desc: "A portrait of her pet in a beautiful art style, printed and framed.", price: "$40–80", budget: ["$25–$50","$50–$100"], occasions: ["Birthday","Just because"], language: "gifts" },
+  { name: "Birthstone jewellery", desc: "A ring, necklace, or bracelet featuring her birthstone.", price: "$50–150", budget: ["$50–$100","$100–$200"], occasions: ["Birthday","Anniversary","Valentine's Day"], language: "gifts" },
+  { name: "Personalised tote bag", desc: "Her name, a meaningful quote, or an inside joke — something that's uniquely hers.", price: "$25–50", budget: ["Under $25","$25–$50"], occasions: ["Birthday","Just because"], language: "gifts" }
+];
+
+/* =================================================================
+   STATE
+   ================================================================= */
+let currentQuestion = 0;
+let answers = [];
+let chosenLanguage = null;
+
+const budgetOptions = ["Under $25", "$25–$50", "$50–$100", "$100–$200", "$200+"];
+const occasionOptions = ["Birthday", "Anniversary", "Just because", "Apology", "Valentine's Day"];
+const languageOptions = [
+  { code: "words", label: "Words" },
+  { code: "touch", label: "Touch" },
+  { code: "service", label: "Service" },
+  { code: "time", label: "Time" },
+  { code: "gifts", label: "Gifts" }
+];
+
+let activeBudget = null;
+let activeOccasion = null;
+let activeLanguage = null;
+
+/* =================================================================
+   QUIZ
+   ================================================================= */
+function renderQuestion() {
+  const q = questions[currentQuestion];
+  document.getElementById('questionNum').textContent = `Question ${String(currentQuestion + 1).padStart(2, '0')}`;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('progressFill').style.width = `${((currentQuestion + 1) / questions.length) * 100}%`;
+  document.getElementById('progressLabel').textContent = `Question ${currentQuestion + 1} of ${questions.length}`;
+
+  const answersEl = document.getElementById('answers');
+  answersEl.innerHTML = '';
+  q.a.forEach((ans) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer';
+    btn.innerHTML = `<span class="answer-letter">${ans.l}</span><span>${ans.t}</span>`;
+    btn.addEventListener('click', () => selectAnswer(btn, ans.l));
+    answersEl.appendChild(btn);
+  });
+}
+
+function selectAnswer(btn, letter) {
+  document.querySelectorAll('.answer').forEach(a => a.classList.remove('selected'));
+  btn.classList.add('selected');
+  answers[currentQuestion] = letter;
+
+  const card = document.getElementById('quizCard');
+  setTimeout(() => {
+    card.classList.add('flipping');
+    setTimeout(() => {
+      if (currentQuestion < questions.length - 1) {
+        currentQuestion++;
+        renderQuestion();
+        card.classList.remove('flipping');
+      } else {
+        showResults();
+      }
+    }, 350);
+  }, 280);
+}
+
+function showResults() {
+  const counts = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+  answers.forEach(a => counts[a]++);
+  const max = Math.max(...Object.values(counts));
+  const winners = Object.keys(counts).filter(k => counts[k] === max);
+
+  document.getElementById('quizWrap').classList.add('hidden');
+  const wrap = document.getElementById('resultsWrap');
+  wrap.classList.remove('hidden');
+
+  if (winners.length === 1) {
+    chosenLanguage = letterToLang[winners[0]];
+    renderResult(chosenLanguage);
+  } else {
+    renderTie(winners.map(w => letterToLang[w]));
+  }
+
+  gsap.from(wrap, { opacity: 0, y: 24, duration: 0.7, ease: "power3.out" });
+}
+
+function renderResult(langCode) {
+  const lang = languages[langCode];
+  chosenLanguage = langCode;
+  document.getElementById('resultIcon').innerHTML = lang.icon;
+  document.getElementById('resultIcon').style.background = lang.gradient.replace('135deg', '135deg').replace(/(#[0-9A-F]{6})/gi, (m) => m + '22');
+  document.getElementById('resultIcon').style.background = `linear-gradient(135deg, ${hexAlpha(getColors(lang.gradient)[0], 0.18)}, ${hexAlpha(getColors(lang.gradient)[1], 0.12)})`;
+  document.getElementById('resultName').textContent = lang.name;
+  document.getElementById('resultDesc').textContent = lang.desc;
+  document.getElementById('tieWrap').classList.add('hidden');
+}
+
+function renderTie(langCodes) {
+  const tieWrap = document.getElementById('tieWrap');
+  tieWrap.classList.remove('hidden');
+  tieWrap.innerHTML = '<div style="width:100%; font-size:13px; color:var(--muted); margin-bottom:6px;">It\'s a tie — pick the one that feels most like her:</div>';
+  langCodes.forEach((code, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tie-choice' + (i === 0 ? ' active' : '');
+    btn.textContent = languages[code].name;
+    btn.addEventListener('click', () => {
+      tieWrap.querySelectorAll('.tie-choice').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderResultBody(code);
+    });
+    tieWrap.appendChild(btn);
+  });
+  renderResultBody(langCodes[0]);
+  tieWrap.classList.remove('hidden');
+}
+
+function renderResultBody(langCode) {
+  const lang = languages[langCode];
+  chosenLanguage = langCode;
+  const colors = getColors(lang.gradient);
+  document.getElementById('resultIcon').innerHTML = lang.icon;
+  document.getElementById('resultIcon').style.background = `linear-gradient(135deg, ${hexAlpha(colors[0], 0.18)}, ${hexAlpha(colors[1], 0.12)})`;
+  document.getElementById('resultName').textContent = lang.name;
+  document.getElementById('resultDesc').textContent = lang.desc;
+}
+
+function getColors(grad) {
+  const match = grad.match(/#[0-9A-Fa-f]{6}/g);
+  return match || ['#FF85A1', '#7C3AED'];
+}
+
+function hexAlpha(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/* =================================================================
+   GIFT FINDER
+   ================================================================= */
+function renderFilters() {
+  const budgetEl = document.getElementById('budgetPills');
+  budgetOptions.forEach(b => {
+    const pill = document.createElement('button');
+    pill.className = 'pill';
+    pill.textContent = b;
+    pill.addEventListener('click', () => {
+      activeBudget = activeBudget === b ? null : b;
+      updateFilterUI();
+      renderGifts();
+    });
+    pill.dataset.value = b;
+    budgetEl.appendChild(pill);
+  });
+
+  const occEl = document.getElementById('occasionPills');
+  occasionOptions.forEach(o => {
+    const pill = document.createElement('button');
+    pill.className = 'pill';
+    pill.textContent = o;
+    pill.addEventListener('click', () => {
+      activeOccasion = activeOccasion === o ? null : o;
+      updateFilterUI();
+      renderGifts();
+    });
+    pill.dataset.value = o;
+    occEl.appendChild(pill);
+  });
+
+  const langEl = document.getElementById('languagePills');
+  const allPill = document.createElement('button');
+  allPill.className = 'pill lang-pill active';
+  allPill.textContent = 'All';
+  allPill.dataset.value = '';
+  allPill.addEventListener('click', () => {
+    activeLanguage = null;
+    updateFilterUI();
+    renderGifts();
+  });
+  langEl.appendChild(allPill);
+
+  languageOptions.forEach(l => {
+    const pill = document.createElement('button');
+    pill.className = 'pill lang-pill';
+    pill.textContent = l.label;
+    pill.dataset.value = l.code;
+    pill.addEventListener('click', () => {
+      activeLanguage = activeLanguage === l.code ? null : l.code;
+      updateFilterUI();
+      renderGifts();
+    });
+    langEl.appendChild(pill);
+  });
+}
+
+function updateFilterUI() {
+  document.querySelectorAll('#budgetPills .pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.value === activeBudget);
+  });
+  document.querySelectorAll('#occasionPills .pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.value === activeOccasion);
+  });
+  document.querySelectorAll('#languagePills .pill').forEach(p => {
+    const val = p.dataset.value;
+    if (val === '') {
+      p.classList.toggle('active', activeLanguage === null);
+    } else {
+      p.classList.toggle('active', val === activeLanguage);
+    }
+  });
+}
+
+function renderGifts() {
+  const grid = document.getElementById('giftGrid');
+  const filtered = gifts.filter(g => {
+    if (activeBudget && !g.budget.includes(activeBudget)) return false;
+    if (activeOccasion && !g.occasions.includes(activeOccasion)) return false;
+    if (activeLanguage && g.language !== activeLanguage) return false;
+    return true;
+  });
+
+  document.getElementById('resultsCount').textContent =
+    filtered.length === 0 ? '' :
+    `${filtered.length} gift${filtered.length === 1 ? '' : 's'} matched`;
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="no-results"><strong>No matches yet.</strong><br>Try loosening a filter.</div>';
+    return;
+  }
+
+  grid.innerHTML = '';
+  filtered.forEach((g, i) => {
+    const lang = languages[g.language];
+    const card = document.createElement('article');
+    card.className = 'gift-card';
+    card.innerHTML = `
+      <div class="gift-image" style="background: ${lang.gradient};">
+        ${lang.icon}
+      </div>
+      <div class="gift-body">
+        <div class="gift-tags">
+          <span class="gift-tag price">${g.price}</span>
+          <span class="gift-tag">${lang.name}</span>
+        </div>
+        <h4 class="gift-name">${g.name}</h4>
+        <p class="gift-desc">${g.desc}</p>
+        <div class="gift-buttons">
+          <a class="gift-btn" href="#" onclick="trackClick('amazon','${g.name.replace(/'/g, "\\'")}'); return false;">Amazon</a>
+          <a class="gift-btn" href="#" onclick="trackClick('etsy','${g.name.replace(/'/g, "\\'")}'); return false;">Etsy</a>
+        </div>
+      </div>
+    `;
+    grid.appendChild(card);
+
+    // 3D tilt
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const rx = ((y / rect.height) - 0.5) * -8;
+      const ry = ((x / rect.width) - 0.5) * 8;
+      card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-4px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+  });
+}
+
+function trackClick(store, gift) {
+  // TODO: replace with real affiliate links (Amazon/Etsy) per gift before launch.
+  console.log(`[affiliate] ${store} click for: ${gift}`);
+}
+
+/* =================================================================
+   NAVIGATION
+   ================================================================= */
+function scrollToSection(id) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function goToGifts() {
+  if (chosenLanguage) {
+    activeLanguage = chosenLanguage;
+    updateFilterUI();
+    renderGifts();
+  }
+  scrollToSection('gifts');
+}
+
+/* =================================================================
+   SHARE
+   ================================================================= */
+function buildShareURL() {
+  const code = chosenLanguage || 'words';
+  return window.location.origin + window.location.pathname + '?result=' + code;
+}
+
+function copyShareLink() {
+  const url = buildShareURL();
+  const btn = document.getElementById('copyBtn');
+  const original = btn.textContent;
+
+  const done = () => {
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+    setTimeout(() => { btn.textContent = original; }, 2000);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(done).catch(fallback);
+  } else {
+    fallback();
+  }
+
+  function fallback() {
+    const ta = document.createElement('textarea');
+    ta.value = url;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    done();
+  }
+}
+
+function shareWhatsApp() {
+  const url = buildShareURL();
+  const text = `I took this quiz and it knows exactly how I want to be loved 💕 ${url} Take it and use it for my next gift ;)`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+/* =================================================================
+   INCOMING (shared link)
+   ================================================================= */
+function handleIncoming() {
+  const params = new URLSearchParams(window.location.search);
+  const result = params.get('result');
+  if (result && languages[result]) {
+    // hide quiz section entirely
+    document.getElementById('quiz').style.display = 'none';
+    chosenLanguage = result;
+    activeLanguage = result;
+    const banner = document.getElementById('incomingBanner');
+    banner.classList.add('show');
+    const lang = languages[result];
+    banner.querySelector('p').innerHTML = `Her love language is <strong>${lang.name}</strong>. These gifts will land.`;
+
+    setTimeout(() => {
+      updateFilterUI();
+      renderGifts();
+      gsap.from(banner, { opacity: 0, y: -20, duration: 0.7, ease: "power3.out" });
+      scrollToSection('gifts');
+    }, 100);
+    return true;
+  }
+  return false;
+}
+
+/* =================================================================
+   THREE.JS PARTICLES
+   ================================================================= */
+function initParticles() {
+  const canvas = document.getElementById('bg-canvas');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 50;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialiased: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  // Heart shape
+  function makeHeartTexture() {
+    const c = document.createElement('canvas');
+    c.width = 64; c.height = 64;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#FF85A1';
+    ctx.beginPath();
+    const x = 32, y = 22, w = 24;
+    ctx.moveTo(x, y + w / 4);
+    ctx.quadraticCurveTo(x, y, x - w / 4, y);
+    ctx.quadraticCurveTo(x - w / 2, y, x - w / 2, y + w / 4);
+    ctx.quadraticCurveTo(x - w / 2, y + w / 2, x, y + w);
+    ctx.quadraticCurveTo(x + w / 2, y + w / 2, x + w / 2, y + w / 4);
+    ctx.quadraticCurveTo(x + w / 2, y, x + w / 4, y);
+    ctx.quadraticCurveTo(x, y, x, y + w / 4);
+    ctx.fill();
+    return new THREE.CanvasTexture(c);
+  }
+
+  function makeDotTexture(color) {
+    const c = document.createElement('canvas');
+    c.width = 64; c.height = 64;
+    const ctx = c.getContext('2d');
+    const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    grad.addColorStop(0, color + 'ff');
+    grad.addColorStop(0.4, color + '80');
+    grad.addColorStop(1, color + '00');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(c);
+  }
+
+  const heartTex = makeHeartTexture();
+  const roseTex = makeDotTexture('#FF85A1');
+  const purpleTex = makeDotTexture('#7C3AED');
+  const goldTex = makeDotTexture('#F59E0B');
+
+  const particles = [];
+  const TOTAL = 80;
+  for (let i = 0; i < TOTAL; i++) {
+    let tex, size;
+    const r = Math.random();
+    if (r < 0.15) {
+      tex = heartTex;
+      size = 1.6 + Math.random() * 0.8;
+    } else if (r < 0.55) {
+      tex = roseTex;
+      size = 1.0 + Math.random() * 1.2;
+    } else if (r < 0.85) {
+      tex = purpleTex;
+      size = 1.0 + Math.random() * 1.2;
+    } else {
+      tex = goldTex;
+      size = 0.8 + Math.random() * 1.0;
+    }
+    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0.35 + Math.random() * 0.35, depthWrite: false });
+    const sprite = new THREE.Sprite(mat);
+    sprite.position.set(
+      (Math.random() - 0.5) * 80,
+      (Math.random() - 0.5) * 80,
+      (Math.random() - 0.5) * 30
+    );
+    sprite.scale.set(size, size, 1);
+    sprite.userData = {
+      vy: 0.015 + Math.random() * 0.025,
+      vx: (Math.random() - 0.5) * 0.008,
+      drift: Math.random() * Math.PI * 2,
+      driftSpeed: 0.005 + Math.random() * 0.01
+    };
+    scene.add(sprite);
+    particles.push(sprite);
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    particles.forEach(p => {
+      p.position.y += p.userData.vy;
+      p.userData.drift += p.userData.driftSpeed;
+      p.position.x += Math.sin(p.userData.drift) * 0.01 + p.userData.vx;
+      if (p.position.y > 42) {
+        p.position.y = -42;
+        p.position.x = (Math.random() - 0.5) * 80;
+      }
+    });
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+}
+
+/* =================================================================
+   SCROLL ANIMATIONS
+   ================================================================= */
+function initScrollAnims() {
+  if (typeof ScrollTrigger === 'undefined') return;
+  gsap.registerPlugin(ScrollTrigger);
+
+  gsap.utils.toArray('section').forEach(sec => {
+    if (sec.classList.contains('hero')) return;
+    gsap.from(sec.querySelectorAll('.section-head, .filters, .quiz-wrap, .share-card'), {
+      opacity: 0,
+      y: 40,
+      duration: 0.9,
+      ease: "power3.out",
+      stagger: 0.1,
+      scrollTrigger: {
+        trigger: sec,
+        start: 'top 80%',
+        once: true
+      }
+    });
+  });
+
+  // Hero animation
+  gsap.from('.hero .eyebrow, .hero h1, .hero p.sub, .hero .cta-row', {
+    opacity: 0,
+    y: 24,
+    duration: 0.9,
+    ease: "power3.out",
+    stagger: 0.12,
+    delay: 0.2
+  });
+}
+
+/* =================================================================
+   INIT
+   ================================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+  renderFilters();
+  const incoming = handleIncoming();
+  if (!incoming) {
+    renderQuestion();
+    renderGifts();
+  }
+  initParticles();
+  initScrollAnims();
+});
+</script>
+
+</body>
+</html>
